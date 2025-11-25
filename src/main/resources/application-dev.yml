@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          google:
+#            client-id: 531364616543-ush91i5jl358h3gj3vv69943bgdg0hlg.apps.googleusercontent.com
+#            client-secret: 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
+#            scope: profile,email
+#            redirect-uri: http://localhost:3000/sign/oauth2
+  datasource:
+    url: jdbc:mysql://localhost:3306/byeoruk_space?useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Seoul
+    username: root
+    password: 1594
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+#    show-sql: true
+    properties:
+      show_sql: true
+      # 쿼리 포멧
+      hibernate.format_sql: true
+      # 쿼리 콘솔에 색깔로 표시
+      hibernate.highlight_sql: true
+# 개인 설정
+bserver:
+  # 개인 설정 - JWT 설정
+  jwt:
+    # 시크릿 키
+    secret: 1DiQ4pqOIAMRjmsZKX83hGwLG6yKT11e3mv7gAUKPNN3I2s7mr3P0SLGEJiGTxDjwaWpI1peek9bsgGT9iA2IFdSkfYZvUzw7TtxkkfvNAS9o10ldu7pwQ0oCASGH5UL
+    # Issuer
+    issuer: http://localhost:5000
+# 로그
+logging:
+  # 쿼리 보여주기
+  org.hibernate.SQL: DEBUG
+  # 쿼리에 바인딩된 값 보기 (? 에 어떤 데이터 들어가는지 볼 수 있음)
+  org.hibernate.orm.jdbc.bind: TRACE
+  # Not work???
+  org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  # 시큐리티 로그
+  org.springframework.security: DEBUG

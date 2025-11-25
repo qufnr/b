@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: Project B
+  profiles:
+    active: dev
+# 전역 개인 설정
+bserver:
+  jwt:
+    # 만료 시간
+    expiration:
+      # 만료 시간 - 로그인 토큰
+      sign: 1
+      # 만료 시간 - 접근 토큰
+      access: 1440
+      # 만료 시간 - 리프레시 토큰
+      refresh: 2880
