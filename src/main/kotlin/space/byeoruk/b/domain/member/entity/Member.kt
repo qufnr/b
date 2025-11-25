@@ -17,7 +17,7 @@ import kotlin.Long
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 @Entity
-class Long: BaseEntity() {
+class Member: BaseEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uid", nullable = false, unique = true, comment = "UID")

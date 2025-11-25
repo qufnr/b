@@ -3,7 +3,6 @@ package space.byeoruk.b.global.configuration
 import lombok.RequiredArgsConstructor
 import org.springframework.data.domain.AuditorAware
 import org.springframework.stereotype.Component
-import space.byeoruk.b.domain.member.entity.Long
 import java.util.Optional
 
 @Component
@@ -14,6 +13,6 @@ class AuditorAwareImpl: AuditorAware<Long> {
      */
     override fun getCurrentAuditor(): Optional<Long> {
         //  TODO :: 계정 UID 넘기기
-        return Optional.ofNullable(null)
+        return Optional.ofNullable(0)
     }
 }
