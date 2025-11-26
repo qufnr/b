@@ -14,7 +14,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 @Configuration
 class SecurityConfiguration {
+    //  허용 해더 목록
     private val allowedHeaders = arrayOf("Authorization")
+    //  허용 메소드 목록
     private val allowedMethods = arrayOf("GET", "POST", "PUT", "DELETE")
 
     /**
@@ -53,6 +55,6 @@ class SecurityConfiguration {
         val configurationSource = UrlBasedCorsConfigurationSource()
         configurationSource.registerCorsConfiguration("/**", configuration)
 
-        return configurationSource;
+        return configurationSource
     }
 }

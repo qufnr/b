@@ -9,6 +9,7 @@ import jakarta.persistence.Table
 import lombok.AccessLevel
 import lombok.Getter
 import lombok.NoArgsConstructor
+import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.global.entity.BaseEntity
 import java.time.LocalDateTime
 import kotlin.Long
@@ -17,30 +18,43 @@ import kotlin.Long
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 @Entity
-class Member: BaseEntity() {
+class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uid", nullable = false, unique = true, comment = "UID")
-    private val uid: Long = 0;
+    val uid: Long? = null,
 
     @Column(name = "id", length = 32, nullable = false, unique = true, comment = "계정")
-    private val id: String = "";
+    val id: String = "",
 
     @Column(name = "password", length = 512, comment = "비밀번호")
-    private val password: String = "";
+    val password: String = "",
 
     @Column(name = "name", length = 16, comment = "계정 이름")
-    private val name: String? = null;
+    val name: String? = null,
+
+    @Column(name = "bio", length = 512, comment = "설명")
+    val bio: String? = null,
 
     @Column(name = "avatar", length = 512, comment = "아바타 (파일명)")
-    private val avatar: String? = null;
+    val avatar: String? = null,
 
     @Column(name = "banner", length = 512, comment = "배너 (파일명)")
-    private val banner: String? = null;
+    val banner: String? = null,
 
     @Column(name = "last_signed_at", nullable = false, comment = "마지막 로그인 날짜")
-    private val lastSignedAt: LocalDateTime = LocalDateTime.now();
+    val lastSignedAt: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "last_name_changed_at", nullable = false, comment = "마지막 계정 이름 변경 날짜")
-    private val lastNameChangedAt: LocalDateTime? = null;
+    val lastNameChangedAt: LocalDateTime? = null,
+): BaseEntity() {
+    /**
+     * 계정 생성 생성자
+     */
+    constructor(request: MemberDto.CreateRequest) : this(
+        id = request.id,
+        password = request.password,
+        name = request.name,
+        bio = request.bio,
+    )
 }
