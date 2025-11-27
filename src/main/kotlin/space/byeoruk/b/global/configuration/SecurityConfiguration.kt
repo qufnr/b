@@ -6,6 +6,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.crypto.factory.PasswordEncoderFactories
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
@@ -13,11 +15,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @EnableWebSecurity
 @Configuration
-class SecurityConfiguration {
+class SecurityConfiguration(
     //  허용 해더 목록
-    private val allowedHeaders = arrayOf("Authorization")
+    private final val allowedHeaders: Array<String> = arrayOf("Authorization"),
     //  허용 메소드 목록
-    private val allowedMethods = arrayOf("GET", "POST", "PUT", "DELETE")
+    private final val allowedMethods: Array<String> = arrayOf("GET", "POST", "PUT", "DELETE")
+) {
 
     /**
      * Security 설정
@@ -45,16 +48,20 @@ class SecurityConfiguration {
 
         configuration.addAllowedOrigin("http://localhost:5000")
         configuration.allowCredentials = true
-        allowedHeaders.forEach {
-            header -> configuration.addAllowedHeader(header)
-        }
-        allowedMethods.forEach {
-            method -> configuration.addAllowedMethod(method)
-        }
+        allowedHeaders.forEach { header -> configuration.addAllowedHeader(header) }
+        allowedMethods.forEach { method -> configuration.addAllowedMethod(method) }
 
         val configurationSource = UrlBasedCorsConfigurationSource()
         configurationSource.registerCorsConfiguration("/**", configuration)
 
         return configurationSource
+    }
+
+    /**
+     * 비밀번호 인코더 Bean
+     */
+    @Bean
+    fun passwordEncoder(): PasswordEncoder {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder()
     }
 }

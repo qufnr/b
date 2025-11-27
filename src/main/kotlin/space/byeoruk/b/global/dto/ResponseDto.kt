@@ -16,5 +16,9 @@ class ResponseDto<T>(
         fun <T>build(data: T, status: HttpStatus, message: String = ""): ResponseDto<T> {
             return ResponseDto(LocalDateTime.now(), data, status, message)
         }
+
+        fun build(status: HttpStatus, message: String = ""): ResponseDto<*> {
+            return ResponseDto(LocalDateTime.now(), null, status, message)
+        }
     }
 }

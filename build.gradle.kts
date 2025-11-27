@@ -48,6 +48,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-websocket-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    //  Kotlin 로깅
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 }
 
 kotlin {

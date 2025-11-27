@@ -2,6 +2,7 @@ package space.byeoruk.b.domain.member.dto
 
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.entity.Member
 import java.time.LocalDateTime
 
@@ -16,10 +17,30 @@ class MemberDto {
         @NotBlank
         @Size(max = 64)
         val password: String,
+        @NotBlank
+        val passwordConfirm: String,
         @Size(max = 16)
         val name: String,
         @Size(max = 512)
         val bio: String,
+    )
+
+    /**
+     * 계정 수정
+     */
+    class UpdateRequest(
+        @Size(max = 16)
+        val name: String,
+        @Size(max = 512)
+        val bio: String,
+    )
+
+    /**
+     * 계정 수정 :: 아바타, 배너
+     */
+    class ImageUpdateRequest(
+        val avatar: MultipartFile,
+        val banner: MultipartFile,
     )
 
     /**
