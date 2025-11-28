@@ -51,6 +51,17 @@ dependencies {
 
     //  Kotlin 로깅
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
+
+    //  JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.12.3")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
+
+    //  YouTube
+    implementation("com.google.api-client:google-api-client:2.7.2")                     //  Google API 통신
+    implementation("com.google.oauth-client:google-oauth-client-jetty:1.23.0")          //  OAuth 2.0 인증 프로토콜 지원
+    implementation("com.google.apis:google-api-services-youtube:v3-rev20230816-2.0.0")  //  YouTube Data API
+    implementation("com.google.http-client:google-http-client-jackson2:1.39.2")         //  HTTP Client with Jackson
 }
 
 kotlin {

@@ -1,21 +1,23 @@
 package space.byeoruk.b.domain.member.entity
 
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.ForeignKey
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
-import lombok.AccessLevel
-import lombok.Getter
-import lombok.NoArgsConstructor
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.global.entity.BaseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.Long
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 @Entity
 class Member(
@@ -52,18 +54,39 @@ class Member(
     @Column(name = "last_name_changed_at", nullable = false, comment = "마지막 계정 이름 변경 날짜")
     var lastNameChangedAt: LocalDateTime? = null,
 ): BaseEntity() {
+
+    @OneToOne
+    @JoinColumn(name = "member_privacy_uid", foreignKey = ForeignKey(name = "FK_member_TO_member_privacy"))
+    var privacy: MemberPrivacy? = null
+
+    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val authorities: MutableList<MemberAuthority> = mutableListOf()
+
     /**
      * 계정 생성 생성자
      */
-    constructor(request: MemberDto.CreateRequest) : this(
+    constructor(request: MemberDto.CreateRequest): this(
         id = request.id,
         password = request.password,
         name = request.name,
-        bio = request.bio,
-    )
+        bio = request.bio
+    ) {
+        privacy = MemberPrivacy()
+        addAuthority(MemberRole.ROLE_MEMBER)
+    }
 
-    fun update(request: MemberDto.UpdateRequest) {
+    /**
+     * 계정 수정
+     */
+    fun update(request: MemberDto.UpdateRequest, imageRequest: MemberDto.ImageUpdateRequest) {
+        if(request.name.isNotBlank() && name != request.name)
+            lastNameChangedAt = LocalDateTime.now()
+
         name = request.name
         bio = request.bio
+    }
+
+    fun addAuthority(role: MemberRole) {
+        authorities.add(MemberAuthority(this, role))
     }
 }

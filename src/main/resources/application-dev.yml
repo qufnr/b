@@ -19,7 +19,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-#    show-sql: true
+    show-sql: true
     properties:
       show_sql: true
       # 쿼리 포멧

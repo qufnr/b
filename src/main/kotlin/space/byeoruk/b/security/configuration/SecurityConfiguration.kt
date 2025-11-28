@@ -1,4 +1,4 @@
-package space.byeoruk.b.global.configuration
+package space.byeoruk.b.security.configuration
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -9,18 +9,19 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import space.byeoruk.b.security.filter.TokenAuthenticationFilter
 
 @EnableWebSecurity
 @Configuration
-class SecurityConfiguration(
+class SecurityConfiguration(private val tokenAuthenticationFilter: TokenAuthenticationFilter) {
     //  허용 해더 목록
-    private final val allowedHeaders: Array<String> = arrayOf("Authorization"),
+    private final val allowedHeaders: Array<String> = arrayOf("Authorization")
     //  허용 메소드 목록
     private final val allowedMethods: Array<String> = arrayOf("GET", "POST", "PUT", "DELETE")
-) {
 
     /**
      * Security 설정
@@ -34,8 +35,12 @@ class SecurityConfiguration(
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/sign-management/signs").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()
                 .anyRequest().denyAll()
             }
+            .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
     }
 

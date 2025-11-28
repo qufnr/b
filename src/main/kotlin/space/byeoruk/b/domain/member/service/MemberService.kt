@@ -2,6 +2,7 @@ package space.byeoruk.b.domain.member.service
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
@@ -46,8 +47,13 @@ class MemberService(
      *
      * @param request 요청 정보
      * @param imageRequest 이미지 관련 요청 정보 (아바타, 배너)
+     * @param memberDetails 계정 디테일
      */
-    fun update(request: MemberDto.UpdateRequest, imageRequest: MemberDto.ImageUpdateRequest) {
-        //  TODO :: 계정 수정 로직 구현
+    fun update(request: MemberDto.UpdateRequest, imageRequest: MemberDto.ImageUpdateRequest, memberDetails: MemberDetails) {
+        val member = memberRepository.findById(memberDetails.username)
+            .orElseThrow{ MemberNotFoundException() }
+
+        member.update(request, imageRequest)
+        memberRepository.save(member)
     }
 }

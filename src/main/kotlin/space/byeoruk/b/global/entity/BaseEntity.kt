@@ -19,7 +19,7 @@ abstract class BaseEntity(
 
     @CreatedBy
     @Column(name = "created_by")
-    val createdBy: kotlin.Long? = null,
+    val createdBy: Long? = null,
 
     @LastModifiedDate
     @Column(name = "modified_at")
@@ -27,5 +27,5 @@ abstract class BaseEntity(
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    val modifiedBy: kotlin.Long? = null,
+    val modifiedBy: Long? = null,
 )

@@ -55,10 +55,21 @@ class MemberDto {
         val banner: String?,
         val lastSignedAt: LocalDateTime,
         val lastNameChangedAt: LocalDateTime?,
+        val privacy: MemberPrivacyDto.Details
     ) {
         companion object {
             fun fromEntity(member: Member): Details {
-                return Details(member.uid!!, member.id, member.name, member.bio, member.avatar, member.banner, member.lastSignedAt, member.lastNameChangedAt)
+                return Details(
+                    member.uid!!,
+                    member.id,
+                    member.name,
+                    member.bio,
+                    member.avatar,
+                    member.banner,
+                    member.lastSignedAt,
+                    member.lastNameChangedAt,
+                    MemberPrivacyDto.Details.fromEntity(member.privacy!!)
+                )
             }
         }
     }
