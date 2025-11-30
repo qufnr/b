@@ -62,6 +62,9 @@ dependencies {
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.23.0")          //  OAuth 2.0 인증 프로토콜 지원
     implementation("com.google.apis:google-api-services-youtube:v3-rev20230816-2.0.0")  //  YouTube Data API
     implementation("com.google.http-client:google-http-client-jackson2:1.39.2")         //  HTTP Client with Jackson
+
+    //  Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 }
 
 kotlin {

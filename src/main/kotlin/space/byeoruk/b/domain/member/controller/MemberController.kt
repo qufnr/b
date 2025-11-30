@@ -1,5 +1,8 @@
 package space.byeoruk.b.domain.member.controller
 
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -16,21 +19,27 @@ import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.service.MemberService
 import space.byeoruk.b.global.dto.ResponseDto
 
+@Tag(name = "Member", description = "계정 API")
 @RequestMapping(name = "/api/member-management/members")
 @RestController
 class MemberController(private val memberService: MemberService) {
 
+    @Operation(summary = "계정 조회", description = "계정 UID 로 상세 계정 정보를 조회합니다.")
     @GetMapping("/{uid}")
-    fun read(@PathVariable uid: Long): ResponseEntity<*> {
+    fun read(
+        @Parameter(description = "계정 UID", example = "1")
+        @PathVariable uid: Long): ResponseEntity<*> {
         return ResponseEntity.ok().body(ResponseDto.build(memberService.read(uid), HttpStatus.OK))
     }
 
+    @Operation(summary = "계정 생성", description = "계정을 생성합니다.")
     @PostMapping
     fun create(@RequestBody request: MemberDto.CreateRequest): ResponseEntity<*> {
         val response = ResponseDto.build(memberService.create(request), HttpStatus.CREATED)
         return ResponseEntity.status(response.status).body(response)
     }
 
+    @Operation(summary = "계정 수정", description = "계정 정보를 수정합니다.")
     @PutMapping
     fun update(
         @RequestBody request: MemberDto.UpdateRequest,

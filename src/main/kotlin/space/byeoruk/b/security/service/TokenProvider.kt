@@ -45,7 +45,7 @@ open class TokenProvider(
      * @param type 토큰 유형
      * @return JWT 문자열
      */
-    fun createToken(value: Map<String, Object>, type: TokenType): String {
+    fun createToken(value: Map<String, String>, type: TokenType): String {
         val date = Date()
         val jwts = Jwts.builder()
 
