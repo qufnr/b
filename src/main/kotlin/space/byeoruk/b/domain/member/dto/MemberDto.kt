@@ -1,10 +1,12 @@
 package space.byeoruk.b.domain.member.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.member.model.MemberResourceType
+import space.byeoruk.b.domain.member.model.MemberRole
 import java.time.LocalDateTime
 
 class MemberDto {
@@ -23,6 +25,9 @@ class MemberDto {
         @Schema(description = "계정 비밀번호 확인", example = "1q2w3e4r!")
         @NotBlank
         val passwordConfirm: String,
+        @Schema(description = "이메일", example = "member@byeoruk.space")
+        @Email
+        val email: String,
         @Schema(description = "계정 이름", example = "김수한무")
         @Size(max = 16)
         val name: String,
@@ -43,12 +48,9 @@ class MemberDto {
         val bio: String,
     )
 
-    /**
-     * 계정 수정 :: 아바타, 배너
-     */
-    class ImageUpdateRequest(
-        val avatar: MultipartFile,
-        val banner: MultipartFile,
+    class ResourceUpdateRequest(
+        val type: MemberResourceType,
+        val isDelete: Boolean,
     )
 
     /**
@@ -71,7 +73,8 @@ class MemberDto {
         val lastSignedAt: LocalDateTime,
         @Schema(description = "마지막 계정 이름 변경 날짜")
         val lastNameChangedAt: LocalDateTime?,
-        val privacy: MemberPrivacyDto.Details
+        val privacy: MemberPrivacyDto.Details,
+        val authorities: List<MemberRole>
     ) {
         companion object {
             fun fromEntity(member: Member): Details {
@@ -84,7 +87,8 @@ class MemberDto {
                     member.banner,
                     member.lastSignedAt,
                     member.lastNameChangedAt,
-                    MemberPrivacyDto.Details.fromEntity(member.privacy!!)
+                    MemberPrivacyDto.Details.fromEntity(member.privacy!!),
+                    member.authorities.map { authority -> authority.authority }.toList()
                 )
             }
         }

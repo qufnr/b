@@ -24,10 +24,13 @@ class Member(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uid", nullable = false, unique = true, comment = "UID")
-    val uid: Long? = null,
+    var uid: Long = 0L,
 
     @Column(name = "id", length = 32, nullable = false, unique = true, comment = "계정")
-    val id: String = "",
+    var id: String = "",
+
+    @Column(name = "email", length = 64, nullable = false, unique = true, comment = "이메일")
+    var email: String = "",
 
     //  계정 생성 시 입력받은 비밀번호를 암호화해야 해서 변경 가능해야 함.
     @Column(name = "password", length = 512, comment = "비밀번호")
@@ -78,7 +81,7 @@ class Member(
     /**
      * 계정 수정
      */
-    fun update(request: MemberDto.UpdateRequest, imageRequest: MemberDto.ImageUpdateRequest) {
+    fun update(request: MemberDto.UpdateRequest) {
         if(request.name.isNotBlank() && name != request.name)
             lastNameChangedAt = LocalDateTime.now()
 
@@ -86,7 +89,35 @@ class Member(
         bio = request.bio
     }
 
+    /**
+     * 역할 추가
+     *
+     * @return role 역할
+     */
     fun addAuthority(role: MemberRole) {
         authorities.add(MemberAuthority(this, role))
+    }
+
+    /**
+     * 역할 설정
+     *
+     * @param roles 역할 목록
+     */
+    fun setAuthorities(roles: MutableList<MemberRole>) {
+        authorities.clear()
+
+        roles.forEach { role -> addAuthority(role) }
+    }
+
+    fun getAvatar(): String? {
+        return avatar
+    }
+
+    fun updateAvatar(filename: String? = null) {
+        avatar = filename
+    }
+
+    fun updateBanner(filename: String? = null) {
+        banner = filename
     }
 }

@@ -28,6 +28,20 @@ spring:
       hibernate.highlight_sql: true
 # 개인 설정
 bserver:
+  # 개인 설정 - 리소스(파일)
+  resource:
+    # 서버 리소스 저장 경로
+    path: 'C:/bserver-resources/'
+    # 사용자 관련 리소스 설정
+    member:
+      # 사용자 아바타
+      avatar:
+        size: 100
+        extensions: 'jpeg,jpg,png,gif'
+      # 사용자 배너
+      banner:
+        size: 100
+        extensions: 'jpeg,jpg,png'
   # 개인 설정 - JWT 설정
   jwt:
     # 시크릿 키

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.service.MemberService
@@ -43,9 +44,18 @@ class MemberController(private val memberService: MemberService) {
     @PutMapping
     fun update(
         @RequestBody request: MemberDto.UpdateRequest,
-        @RequestPart imageRequest: MemberDto.ImageUpdateRequest,
         @AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<*> {
-        memberService.update(request, imageRequest, memberDetails)
+        memberService.update(request, memberDetails)
+        return ResponseEntity.noContent().build<ResponseDto<*>>()
+    }
+
+    @Operation(summary = "계정 리소스(아바타, 배너) 수정", description = "계정 아바타 또는 배너를 수정합니다.")
+    @PutMapping("/resource")
+    fun update(
+        @RequestBody request: MemberDto.ResourceUpdateRequest,
+        @RequestPart file: MultipartFile,
+        @AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<*> {
+        memberService.update(request, file, memberDetails)
         return ResponseEntity.noContent().build<ResponseDto<*>>()
     }
 }

@@ -4,8 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema
 
 class SignDto {
     class IdRequest(
-        @Schema(description = "계정 ID", example = "username1234")
-        val id: String
+        @Schema(description = "계정 ID 또는 이메일", example = "username1234")
+        val value: String
     )
 
     class IdDetails(
@@ -22,4 +22,17 @@ class SignDto {
             }
         }
     }
+
+    class Request(
+        @Schema(description = "계정 비밀번호", example = "1q2w3e4r!!")
+        val password: String
+    )
+
+    class Details(
+        @Schema(description = "Access Token", example = "JWT...")
+        val access: String,
+        @Schema(description = "Refresh Token", example = "JWT...")
+        val refresh: String,
+        val member: MemberDto.Details
+    )
 }

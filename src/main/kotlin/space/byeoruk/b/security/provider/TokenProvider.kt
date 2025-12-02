@@ -1,4 +1,4 @@
-package space.byeoruk.b.security.service
+package space.byeoruk.b.security.provider
 
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
@@ -8,7 +8,6 @@ import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SecurityException
 import jakarta.annotation.PostConstruct
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import space.byeoruk.b.global.utility.DateUtilities
@@ -62,18 +61,17 @@ open class TokenProvider(
     /**
      * HTTP 요청 정보의 해더에서 사용자 토큰 추출
      *
-     * @param request 요청
+     * @param bearerToken Authentication(혹은 사용자 지정)헤더에 있는 Bearer 토큰 문자열
      * @return JWT 문자열
      */
-    fun getBearerToken(request: HttpServletRequest): String {
-        val tokenRawText = request.getHeader("Authorization")
-        if(tokenRawText.isBlank())
+    fun getBearerToken(bearerToken: String): String {
+        if(bearerToken.isBlank())
             throw TokenValidationException("토큰이 누락되었습니다.")
 
-        if(!tokenRawText.startsWith(authorizationBearer))
+        if(!bearerToken.startsWith(authorizationBearer))
             throw TokenValidationException("토큰에 \"%s\"이(가) 누락되었습니다.".format(authorizationBearer))
 
-        return tokenRawText.substring(authorizationBearer.length).trim()
+        return bearerToken.substring(authorizationBearer.length).trim()
     }
 
     fun isValidToken(token: String? = null): Boolean {
@@ -89,7 +87,7 @@ open class TokenProvider(
             //  여기서 토큰 유형이 없으면 예외 터짐
             val tokenType = TokenType.valueOf(payload["type"] as String)
 
-            if(tokenType == TokenType.ACCESS && payload["authorities"].toString().isBlank())
+            if(tokenType == TokenType.ACCESS && (payload["authorities"] == null || payload["authorities"].toString().isBlank()))
                 throw TokenValidationException("계정 역할이 배분되지 않았습니다.")
 
             return !payload.expiration.before(Date())

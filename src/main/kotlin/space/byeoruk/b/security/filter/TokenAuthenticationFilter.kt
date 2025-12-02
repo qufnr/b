@@ -10,14 +10,15 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import space.byeoruk.b.domain.member.service.MemberDetailsServiceImpl
 import space.byeoruk.b.security.model.TokenType
-import space.byeoruk.b.security.service.TokenProvider
+import space.byeoruk.b.security.provider.TokenProvider
 
 @Component
 class TokenAuthenticationFilter(private val tokenProvider: TokenProvider, private val memberDetailsService: MemberDetailsServiceImpl): OncePerRequestFilter() {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         try {
-            val token = tokenProvider.getBearerToken(request)
+            val token = tokenProvider.getBearerToken(request.getHeader("Authorization"))
+
             if(tokenProvider.isValidToken(token) && tokenProvider.getTokenType(token) == TokenType.ACCESS) {
                 val payload = tokenProvider.getTokenPayload(token)
                 val memberDetails = memberDetailsService.loadUserByUsername(payload["id"] as String)
