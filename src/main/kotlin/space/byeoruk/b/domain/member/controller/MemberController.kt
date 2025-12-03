@@ -58,4 +58,10 @@ class MemberController(private val memberService: MemberService) {
         memberService.update(request, file, memberDetails)
         return ResponseEntity.noContent().build<ResponseDto<*>>()
     }
+
+    @Operation(summary = "계정 ID 또는 이메일 사용 가능 여부 확인", description = "입력한 계정 ID 또는 이메일을 사용할 수 있는지 검증합니다.")
+    @GetMapping("/can-use")
+    fun canUse(request: MemberDto.CanUseRequest): ResponseEntity<*> {
+        return ResponseEntity.ok().body(memberService.canUse(request))
+    }
 }

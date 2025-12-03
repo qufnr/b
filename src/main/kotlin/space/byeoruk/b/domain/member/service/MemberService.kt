@@ -8,6 +8,7 @@ import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
+import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
@@ -94,5 +95,20 @@ class MemberService(
         }
 
         memberRepository.save(member)
+    }
+
+    /**
+     * 계정 ID 사용 가능 여부 확인
+     *
+     * @param request 요청 정보
+     * @return 사용 가능 여부
+     */
+    fun canUse(request: MemberDto.CanUseRequest): MemberDto.CanUseResponse {
+        val member = when(request.type) {
+            MemberCanUseType.ID -> memberRepository.findById(request.value)
+            MemberCanUseType.EMAIL -> memberRepository.findByEmail(request.value)
+        }.orElse(null)
+
+        return MemberDto.CanUseResponse(member == null)
     }
 }

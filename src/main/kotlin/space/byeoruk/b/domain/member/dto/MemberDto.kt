@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
 import java.time.LocalDateTime
@@ -59,6 +60,24 @@ class MemberDto {
     )
 
     /**
+     * 계정 ID 또는 이메일 사용 가능 확인 요청
+     */
+    class CanUseRequest(
+        @Schema(description = "유형 (ID | EMAIL)", example = "EMAIL")
+        val type: MemberCanUseType,
+        @Schema(description = "확인 값", example = "user@example.com")
+        val value: String
+    )
+
+    /**
+     * 계정 ID 또는 이메일 사용 가능 여부 응답
+     */
+    class CanUseResponse(
+        @Schema(description = "사용 가능 여부", example = "true")
+        val canUse: Boolean,
+    )
+
+    /**
      * 기본 계정 조회
      */
     class Details(
@@ -84,7 +103,7 @@ class MemberDto {
         companion object {
             fun fromEntity(member: Member): Details {
                 return Details(
-                    member.uid!!,
+                    member.uid,
                     member.id,
                     member.name,
                     member.bio,
