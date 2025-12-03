@@ -40,7 +40,8 @@ class SecurityConfiguration(
             .cors { configurer -> configurer.configurationSource(corsConfigurationSource) }
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/member-management/signs").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()
