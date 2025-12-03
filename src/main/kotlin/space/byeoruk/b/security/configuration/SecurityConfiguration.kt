@@ -13,11 +13,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import space.byeoruk.b.security.exception.AccessDeniedHandlerImpl
+import space.byeoruk.b.security.exception.AuthenticationEntryPointImpl
 import space.byeoruk.b.security.filter.TokenAuthenticationFilter
 
 @EnableWebSecurity
 @Configuration
-class SecurityConfiguration(private val tokenAuthenticationFilter: TokenAuthenticationFilter) {
+class SecurityConfiguration(
+    private val tokenAuthenticationFilter: TokenAuthenticationFilter,
+    private val authenticationEntryPointImpl: AuthenticationEntryPointImpl,
+    private val accessDeniedHandlerImpl: AccessDeniedHandlerImpl,
+) {
     //  허용 해더 목록
     private final val allowedHeaders: Array<String> = arrayOf("Authorization")
     //  허용 메소드 목록
@@ -34,11 +40,15 @@ class SecurityConfiguration(private val tokenAuthenticationFilter: TokenAuthenti
             .cors { configurer -> configurer.configurationSource(corsConfigurationSource) }
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/sign-management/signs").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/member-management/signs").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()
                 .anyRequest().denyAll()
+            }
+            .exceptionHandling { configurer -> configurer
+                .authenticationEntryPoint(authenticationEntryPointImpl)
+                .accessDeniedHandler(accessDeniedHandlerImpl)
             }
             .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .build()
