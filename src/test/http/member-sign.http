@@ -1,0 +1,18 @@
+### ID 인증
+
+POST {{url}}member-management/signs/id
+Content-Type: application/json
+
+{
+    "value": "aris1"
+}
+
+### 로그인
+
+POST {{url}}member-management/signs
+Content-Type: application/json
+X-BServer-Sign-Authentication: {{bearer.sign}}
+
+{
+    "password": "1234"
+}

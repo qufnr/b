@@ -1,1 +1,13 @@
 ### 계정 생성
+
+POST {{url}}member-management/members
+Content-Type: application/json
+
+{
+    "id": "aris1",
+    "password": "1234",
+    "passwordConfirm": "12",
+    "email": "aris.tendou@kivotos.jp",
+    "name": "아리텐동",
+    "bio": "<p></p>"
+}
