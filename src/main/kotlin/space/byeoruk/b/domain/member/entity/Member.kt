@@ -109,14 +109,20 @@ class Member(
         roles.forEach { role -> addAuthority(role) }
     }
 
-    fun getAvatar(): String? {
-        return avatar
-    }
-
+    /**
+     * 아바타 수정
+     *
+     * @param filename 서버에 저장된 파일 명 (`null` 일 경우 삭제)
+     */
     fun updateAvatar(filename: String? = null) {
         avatar = filename
     }
 
+    /**
+     * 배너 수정
+     *
+     * @param filename 서버에 저장된 파일 명 (`null` 일 경우 삭제)
+     */
     fun updateBanner(filename: String? = null) {
         banner = filename
     }
