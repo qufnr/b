@@ -58,7 +58,7 @@ class Member(
     var lastNameChangedAt: LocalDateTime? = null,
 ): BaseEntity() {
 
-    @OneToOne
+    @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "member_privacy_uid", foreignKey = ForeignKey(name = "FK_member_TO_member_privacy"))
     var privacy: MemberPrivacy? = null
 
