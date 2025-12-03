@@ -34,8 +34,9 @@ class SignService(
             Pair("name", if(member.name == null || member.name!!.isBlank()) member.id else member.name!!),
         )
         val token = tokenProvider.createToken(claims, TokenType.SIGN)
+        val expiration = tokenProvider.getTokenPayload(token).expiration.time
 
-        return SignDto.IdDetails.build(token, claims)
+        return SignDto.IdDetails.build(token, expiration, claims)
     }
 
     /**
@@ -62,10 +63,7 @@ class SignService(
         if(!passwordEncoder.matches(request.password, member.password))
             throw MemberPasswordMismatchException()
 
-        val accessToken = issueAccessTokenByMember(member)
-        val refreshToken = issueRefreshTokenByMember(member)
-
-        return SignDto.Details(accessToken, refreshToken, MemberDto.Details.fromEntity(member))
+        return issueTokensByMember(member)
     }
 
     /**
@@ -88,38 +86,39 @@ class SignService(
         val member = memberRepository.findById(memberUid)
             .orElseThrow { MemberNotFoundException() }
 
-        val accessToken = issueAccessTokenByMember(member)
-        val refreshToken = issueRefreshTokenByMember(member)
-
-        return SignDto.Details(accessToken, refreshToken, MemberDto.Details.fromEntity(member))
+        return issueTokensByMember(member)
     }
 
     /**
-     * 사용자 Entity 로 접근 토큰 발급
+     * 사용자 Entity 로 접근 토큰 및 리프레시 토큰 발급 후 로그인 응답 반환
      *
      * @param member 사용자 Entity
-     * @return 접근 토큰 문자열
+     * @return 로그인 응답
      */
-    private fun issueAccessTokenByMember(member: Member): String {
-        //  접근 토큰 Claims 맵
+    private fun issueTokensByMember(member: Member): SignDto.Details {
+        //  접근 토큰 Claims
         val accessClaims = mapOf(
             Pair("uid", member.uid.toString()),
             Pair("id", member.id),
             Pair("authorities", member.authorities.map { authority -> authority.authority.toString() }.toList().joinToString(separator = ","))
         )
+        //  리프레시 토큰 Claims
+        val refreshClaims = mapOf(
+            Pair("uid", member.uid.toString())
+        )
 
-        return tokenProvider.createToken(accessClaims, TokenType.ACCESS)
-    }
+        val accessToken = tokenProvider.createToken(accessClaims, TokenType.ACCESS)
+        val accessExpiration = tokenProvider.getTokenPayload(accessToken).expiration.time
 
-    /**
-     * 사용자 Entity 로 리프레시 토큰 발급
-     *
-     * @param member 사용자 Entity
-     * @return 리프레시 토큰 문자열
-     */
-    private fun issueRefreshTokenByMember(member: Member): String {
-        //  리프레시 토큰 Claims 맵
-        val refreshClaims = mapOf(Pair("uid", member.uid.toString()),)
-        return tokenProvider.createToken(refreshClaims, TokenType.REFRESH)
+        val refreshToken = tokenProvider.createToken(refreshClaims, TokenType.REFRESH)
+        val refreshExpiration = tokenProvider.getTokenPayload(refreshToken).expiration.time
+
+        return SignDto.Details(
+            accessToken,
+            accessExpiration,
+            refreshToken,
+            refreshExpiration,
+            MemberDto.Details.fromEntity(member)
+        )
     }
 }

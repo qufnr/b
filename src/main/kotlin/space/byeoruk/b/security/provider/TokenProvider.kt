@@ -140,11 +140,11 @@ open class TokenProvider(
      * 토큰 유형으로 토큰 만료 시간 반환
      *
      * @param type 토큰 유형
-     * @param now 현재 시간
+     * @param standardDate 기준 시간 (선택, 없을 경우 현재 시간 기준으로 자동 설정)
      * @return 만료 시간 (Date 형식)
      */
-    private fun getExpirationByTokenType(type: TokenType, now: Date): Date {
-        var nowDateTime = DateUtilities.dateToLocalDateTime(now)
+    private fun getExpirationByTokenType(type: TokenType, standardDate: Date? = null): Date {
+        var nowDateTime = DateUtilities.dateToLocalDateTime(standardDate ?: Date())
 
         nowDateTime = when(type) {
             TokenType.SIGN -> nowDateTime.plusMinutes(signExpiration)

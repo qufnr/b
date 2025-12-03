@@ -14,11 +14,13 @@ class SignDto {
         @Schema(description = "계정 이름 (없을 경우 ID 로 대체 됨)", example = "김수한무")
         val name: String?,
         @Schema(description = "JWT 문자열")
-        val token: String
+        val token: String,
+        @Schema(description = "JWT 만료 시간", example = "1234421412")
+        val expiration: Long,
     ) {
         companion object {
-            fun build(token: String, value: Map<String, String>): IdDetails {
-                return IdDetails(value["id"]!!, value["name"], token)
+            fun build(token: String, expiration: Long, value: Map<String, String>): IdDetails {
+                return IdDetails(value["id"]!!, value["name"], token, expiration)
             }
         }
     }
@@ -29,10 +31,14 @@ class SignDto {
     )
 
     class Details(
-        @Schema(description = "Access Token", example = "JWT...")
+        @Schema(description = "접근 토큰", example = "JWT...")
         val access: String,
-        @Schema(description = "Refresh Token", example = "JWT...")
+        @Schema(description = "접근 토큰 만료 시간", example = "123124124124")
+        val accessExpiration: Long,
+        @Schema(description = "리프레시 토큰", example = "JWT...")
         val refresh: String,
+        @Schema(description = "리프레시 토큰 만료 시간", example = "123124124124")
+        val refreshExpiration: Long,
         val member: MemberDto.Details
     )
 }
