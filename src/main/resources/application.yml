@@ -3,6 +3,9 @@ spring:
     name: Project B
   profiles:
     active: dev
+  web:
+    resources:
+      add-mappings: false
 server:
   port: 8172
 # 전역 개인 설정
