@@ -48,8 +48,13 @@ class MemberDto {
         val bio: String,
     )
 
+    /**
+     * 계정 리소스(아바타, 배너) 수정 요청
+     */
     class ResourceUpdateRequest(
+        @Schema(description = "리소스 유형 (AVATAR | BANNER)", example = "AVATAR")
         val type: MemberResourceType,
+        @Schema(description = "삭제 여부", example = "false")
         val isDelete: Boolean,
     )
 
