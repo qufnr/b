@@ -17,6 +17,8 @@ class AuthenticationEntryPointImpl: AuthenticationEntryPoint {
     }
 
     override fun commence(request: HttpServletRequest, response: HttpServletResponse, authException: AuthenticationException) {
-        resolver.resolveException(request, response, null, request.getAttribute("exception") as Exception)
+        val exception = request.getAttribute("exception")
+        if(exception != null && exception is Exception)
+            resolver.resolveException(request, response, null, exception)
     }
 }
