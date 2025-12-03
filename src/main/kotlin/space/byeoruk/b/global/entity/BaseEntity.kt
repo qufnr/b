@@ -12,20 +12,24 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseEntity(
+abstract class BaseEntity {
     @CreatedDate
     @Column(name = "created_at", updatable = false)
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    var createdAt: LocalDateTime? = null
+        protected set
 
     @CreatedBy
     @Column(name = "created_by")
-    val createdBy: Long? = null,
+    var createdBy: Long? = null
+        protected set
 
     @LastModifiedDate
     @Column(name = "modified_at")
-    val modifiedAt: LocalDateTime? = null,
+    var modifiedAt: LocalDateTime? = null
+        protected set
 
     @LastModifiedBy
     @Column(name = "modified_by")
-    val modifiedBy: Long? = null,
-)
+    var modifiedBy: Long? = null
+        protected set
+}
