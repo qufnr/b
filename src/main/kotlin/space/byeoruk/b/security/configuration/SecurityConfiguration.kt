@@ -1,5 +1,6 @@
 package space.byeoruk.b.security.configuration
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -9,7 +10,7 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.crypto.factory.PasswordEncoderFactories
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -23,6 +24,9 @@ class SecurityConfiguration(
     private val tokenAuthenticationFilter: TokenAuthenticationFilter,
     private val authenticationEntryPointImpl: AuthenticationEntryPointImpl,
     private val accessDeniedHandlerImpl: AccessDeniedHandlerImpl,
+
+    @Value($$"${bserver.app-url}")
+    private val appUrl: String
 ) {
     //  허용 해더 목록
     private final val allowedHeaders: Array<String> = arrayOf("Authorization")
@@ -51,7 +55,7 @@ class SecurityConfiguration(
                 .authenticationEntryPoint(authenticationEntryPointImpl)
                 .accessDeniedHandler(accessDeniedHandlerImpl)
             }
-            .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(tokenAuthenticationFilter, BasicAuthenticationFilter::class.java)
             .build()
     }
 
@@ -62,7 +66,7 @@ class SecurityConfiguration(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.addAllowedOrigin("http://localhost:5000")
+        configuration.addAllowedOrigin(appUrl)
         configuration.allowCredentials = true
         allowedHeaders.forEach { header -> configuration.addAllowedHeader(header) }
         allowedMethods.forEach { method -> configuration.addAllowedMethod(method) }

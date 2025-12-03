@@ -28,6 +28,8 @@ spring:
       hibernate.highlight_sql: true
 # 개인 설정
 bserver:
+  # 앱 URL
+  app-url: http://localhost:5000
   # 개인 설정 - 리소스(파일)
   resource:
     # 서버 리소스 저장 경로
