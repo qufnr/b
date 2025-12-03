@@ -21,7 +21,7 @@ import space.byeoruk.b.domain.member.service.MemberService
 import space.byeoruk.b.global.dto.ResponseDto
 
 @Tag(name = "Member", description = "계정 API")
-@RequestMapping(name = "/api/member-management/members")
+@RequestMapping("/api/member-management/members")
 @RestController
 class MemberController(private val memberService: MemberService) {
 
