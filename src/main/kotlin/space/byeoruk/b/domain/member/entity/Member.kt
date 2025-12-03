@@ -54,7 +54,7 @@ class Member(
     @Column(name = "last_signed_at", nullable = false, comment = "마지막 로그인 날짜")
     var lastSignedAt: LocalDateTime = LocalDateTime.now(),
 
-    @Column(name = "last_name_changed_at", nullable = false, comment = "마지막 계정 이름 변경 날짜")
+    @Column(name = "last_name_changed_at", comment = "마지막 계정 이름 변경 날짜")
     var lastNameChangedAt: LocalDateTime? = null,
 ): BaseEntity() {
 
@@ -76,6 +76,8 @@ class Member(
     ) {
         privacy = MemberPrivacy()
         addAuthority(MemberRole.ROLE_MEMBER)
+        if(request.name != null && request.name.isNotBlank())
+            lastNameChangedAt = LocalDateTime.now()
     }
 
     /**

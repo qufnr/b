@@ -30,7 +30,7 @@ class MemberDto {
         val email: String,
         @Schema(description = "계정 이름", example = "김수한무")
         @Size(max = 16)
-        val name: String,
+        val name: String?,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
         @Size(max = 512)
         val bio: String,
