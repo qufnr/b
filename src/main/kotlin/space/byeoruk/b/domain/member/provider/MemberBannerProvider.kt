@@ -1,6 +1,7 @@
 package space.byeoruk.b.domain.member.provider
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberBannerNotFoundException
@@ -8,6 +9,7 @@ import space.byeoruk.b.domain.member.exception.MemberResourceTransferFailedExcep
 import space.byeoruk.b.global.provider.EntityFileProvider
 import space.byeoruk.b.global.provider.ServerResourceProvider
 
+@Component
 class MemberBannerProvider(
     @Value($$"${bserver.resource.member.banner.size}")
     private val maximumSize: Long,
