@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.NoHandlerFoundException
 import space.byeoruk.b.global.dto.ResponseDto
 import space.byeoruk.b.global.dto.ValidationDto
 import java.util.stream.Collectors
@@ -28,9 +29,8 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception::class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    fun handleException(e: Exception, logging: Boolean = true): ResponseEntity<*> {
-        if(logging)
-            log.error(e) { "Unhandled Exception" }
+    fun handleException(e: Exception): ResponseEntity<*> {
+        log.error(e) { "Exception" }
 
         return ResponseEntity.internalServerError()
             .body(ResponseDto.build(HttpStatus.INTERNAL_SERVER_ERROR, e.message!!))
@@ -49,6 +49,16 @@ class GlobalExceptionHandler {
 
         return ResponseEntity.badRequest()
             .body(ResponseDto.build(HttpStatus.BAD_REQUEST, e.message!!))
+    }
+
+    @ExceptionHandler(NoHandlerFoundException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    fun handleException(e: NoHandlerFoundException): ResponseEntity<*> {
+        log.error(e) { "찾을 수 없음 예외" }
+
+        val response = ResponseDto.build(HttpStatus.NOT_FOUND, e.message!!)
+        return ResponseEntity.status(response.status)
+            .body(response)
     }
 
     /**
@@ -118,8 +128,7 @@ class GlobalExceptionHandler {
         if(e.rootCause is ConstraintViolationException)
             return handleException(e.rootCause as ConstraintViolationException)
 
-        log.error(e) { "Database Table Transaction Exception" }
-        return handleException(e, false)
+        return handleException(e)
     }
 
     /**
