@@ -11,3 +11,6 @@ Content-Type: application/json
     "name": "아리텐동",
     "bio": "<p></p>"
 }
+
+### 계정 ID 또는 이메일 사용 가능 여부 확인
+GET {{url}}member-management/members/can-use?type=ID&value=aris
