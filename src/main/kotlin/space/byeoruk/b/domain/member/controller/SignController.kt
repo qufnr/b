@@ -35,8 +35,8 @@ class SignController(private val signService: SignService) {
 
     @Operation(summary = "토큰 리프레시", description = "접근 토큰을 다시 발급 받습니다.")
     @PostMapping("/refresh")
-    fun refresh(@RequestHeader("X-BServer-Refresh-Authentication") authentication: String): ResponseEntity<*> {
-        val response = ResponseDto.build(signService.refresh(authentication), HttpStatus.CREATED)
+    fun refresh(@RequestHeader("X-BServer-Refresh-Authentication") token: String): ResponseEntity<*> {
+        val response = ResponseDto.build(signService.refresh(token), HttpStatus.CREATED)
 
         return ResponseEntity.status(response.status).body(response)
     }

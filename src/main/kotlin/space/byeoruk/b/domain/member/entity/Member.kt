@@ -18,7 +18,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.Long
 
-@Table(name = "member")
+@Table(name = "member", comment = "계정")
 @Entity
 class Member(
     @Id
@@ -56,25 +56,30 @@ class Member(
 
     @Column(name = "last_name_changed_at", comment = "마지막 계정 이름 변경 날짜")
     var lastNameChangedAt: LocalDateTime? = null,
-): BaseEntity() {
 
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "member_privacy_uid", foreignKey = ForeignKey(name = "FK_member_TO_member_privacy"))
-    var privacy: MemberPrivacy? = null
+    var privacy: MemberPrivacy
+
+): BaseEntity() {
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
     val authorities: MutableList<MemberAuthority> = mutableListOf()
+
+//    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
+//    val histories: MutableList<MemberHistory> = mutableListOf()
 
     /**
      * 계정 생성 생성자
      */
     constructor(request: MemberDto.CreateRequest): this(
         id = request.id,
+        email = request.email,
         password = request.password,
         name = request.name,
-        bio = request.bio
-    ) {
+        bio = request.bio,
         privacy = MemberPrivacy()
+    ) {
         addAuthority(MemberRole.ROLE_MEMBER)
         if(request.name != null && request.name.isNotBlank())
             lastNameChangedAt = LocalDateTime.now()

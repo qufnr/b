@@ -101,6 +101,12 @@ class MemberDto {
         val authorities: List<MemberRole>
     ) {
         companion object {
+            /**
+             * 계정 Entity 를 MemberDto.Details 로 변환
+             *
+             * @param member 계정 Entity
+             * @return MemberDto.Details 항목
+             */
             fun fromEntity(member: Member): Details {
                 return Details(
                     member.uid,
@@ -111,10 +117,27 @@ class MemberDto {
                     member.banner,
                     member.lastSignedAt,
                     member.lastNameChangedAt,
-                    MemberPrivacyDto.Details.fromEntity(member.privacy!!),
+                    MemberPrivacyDto.Details.fromEntity(member.privacy),
                     member.authorities.map { authority -> authority.authority }.toList()
                 )
             }
+
+            /**
+             * 로그 찍을 때 쓰는 스냅샷
+             *
+             * @param member 계정 Entity
+             * @return 스냅샷 맵
+             */
+            fun snapshots(member: Member): Map<String, Any?> = mapOf(
+                "member.id" to member.id,
+                "member.name" to member.name,
+                "member.email" to member.email,
+                "member.bio" to member.bio,
+                "member.avatar" to member.avatar,
+                "member.banner" to member.banner,
+                "member.privacy.isPublic" to member.privacy.isPublic,
+                "member.privacy.isBirthdayPublic" to member.privacy.isBirthdayPublic,
+            )
         }
     }
 }

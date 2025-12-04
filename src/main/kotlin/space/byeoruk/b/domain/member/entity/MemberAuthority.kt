@@ -5,6 +5,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
+import jakarta.persistence.ForeignKey
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -23,15 +24,15 @@ class MemberAuthority(
 
     @Column(name = "authority", length = 32, nullable = false, comment = "권한")
     @Enumerated(EnumType.STRING)
-    var authority: MemberRole
-) {
+    var authority: MemberRole,
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_uid", nullable = false)
-    lateinit var member: Member
+    @JoinColumn(name = "member_uid", nullable = false, foreignKey = ForeignKey(name = "FK_member_authority_TO_member"))
+    var member: Member
+) {
 
     constructor(member: Member, role: MemberRole) : this(
-        authority = role
-    ) {
-        this.member = member
-    }
+        authority = role,
+        member = member
+    )
 }

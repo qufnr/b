@@ -2,11 +2,13 @@ package space.byeoruk.b.domain.member.service
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordMismatchException
+import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.security.exception.TokenValidationException
 import space.byeoruk.b.security.model.TokenType
@@ -46,6 +48,7 @@ class SignService(
      * @param authentication 로그인 토큰 문자열
      * @return 로그인 정보 (접근 토큰, 리프레시 토큰, 사용자 기본 정보)
      */
+    @MemberAction(MemberHistoryType.SIGN)
     fun sign(request: SignDto.Request, authentication: String): SignDto.Details {
         val token = tokenProvider.getBearerToken(authentication)
         if(!tokenProvider.isValidToken(token))
@@ -69,11 +72,11 @@ class SignService(
     /**
      * 리프레시 토큰으로 접근 토큰 및 리프레시 토큰 재발급
      *
-     * @param authentication 리프레시 토큰 문자열
+     * @param token 리프레시 토큰 문자열
      * @return 로그인 정보 (접근 토큰, 리프레시 토큰, 사용자 기본 정보)
      */
-    fun refresh(authentication: String): SignDto.Details {
-        val token = tokenProvider.getBearerToken(authentication)
+    fun refresh(token: String): SignDto.Details {
+        val token = tokenProvider.getBearerToken(token)
         if(!tokenProvider.isValidToken(token))
             throw TokenValidationException("잘못된 토큰입니다.")
 

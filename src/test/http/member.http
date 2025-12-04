@@ -12,5 +12,15 @@ Content-Type: application/json
     "bio": "<p></p>"
 }
 
+### 계정 수정
+PUT {{url}}member-management/members
+Content-Type: application/json
+Authentication: Bearer {{bearer.sign}}
+
+{
+    "name": "아리텐동1",
+    "bio": "<p></p>"
+}
+
 ### 계정 ID 또는 이메일 사용 가능 여부 확인
 GET {{url}}member-management/members/can-use?type=ID&value=aris

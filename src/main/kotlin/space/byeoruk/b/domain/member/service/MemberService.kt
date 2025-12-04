@@ -3,12 +3,14 @@ package space.byeoruk.b.domain.member.service
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
+import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
@@ -56,9 +58,14 @@ class MemberService(
      * @param request 요청 정보
      * @param memberDetails 계정 디테일
      */
+    @MemberAction(type = MemberHistoryType.ACCOUNT_UPDATED, trackUpdates = true)
     fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails) {
+        println("계정 수정?")
+
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
+
+        println("계정 수정 222?")
 
         member.update(request)
         memberRepository.save(member)
