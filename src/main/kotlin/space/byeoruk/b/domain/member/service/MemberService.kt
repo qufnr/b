@@ -43,7 +43,7 @@ class MemberService(
      * @return 생성된 계정 정보
      */
     fun create(request: MemberDto.CreateRequest): MemberDto.Details {
-        if(request.password == request.passwordConfirm)
+        if(request.password != request.passwordConfirm)
             throw MemberPasswordConfirmMismatchException()
 
         val member = Member(request)
