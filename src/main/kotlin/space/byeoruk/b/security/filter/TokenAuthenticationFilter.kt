@@ -1,5 +1,6 @@
 package space.byeoruk.b.security.filter
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -12,8 +13,13 @@ import space.byeoruk.b.domain.member.service.MemberDetailsServiceImpl
 import space.byeoruk.b.security.model.TokenType
 import space.byeoruk.b.security.provider.TokenProvider
 
+private val log = KotlinLogging.logger {}
+
 @Component
-class TokenAuthenticationFilter(private val tokenProvider: TokenProvider, private val memberDetailsService: MemberDetailsServiceImpl): OncePerRequestFilter() {
+class TokenAuthenticationFilter(
+    private val tokenProvider: TokenProvider,
+    private val memberDetailsService: MemberDetailsServiceImpl
+): OncePerRequestFilter() {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         try {
@@ -39,6 +45,7 @@ class TokenAuthenticationFilter(private val tokenProvider: TokenProvider, privat
             }
         }
         catch(e: Exception) {
+            log.error(e) { "필터 예외 발생" }
             request.setAttribute("exception", e)
         }
 

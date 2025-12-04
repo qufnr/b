@@ -15,7 +15,7 @@ Content-Type: application/json
 ### 계정 수정
 PUT {{url}}member-management/members
 Content-Type: application/json
-Authentication: Bearer {{bearer.sign}}
+Authorization: Bearer {{bearer.sign}}
 
 {
     "name": "아리텐동1",

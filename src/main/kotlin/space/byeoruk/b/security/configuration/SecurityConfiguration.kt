@@ -29,9 +29,14 @@ class SecurityConfiguration(
     private val appUrl: String
 ) {
     //  허용 해더 목록
-    private final val allowedHeaders: Array<String> = arrayOf("Authorization")
+    private final val allowedHeaders: Array<String> = arrayOf(
+        "Authorization",
+        "Content-Type",
+        "X-BServer-Sign-Authorization",
+        "X-BServer-Refresh-Authorization",
+    )
     //  허용 메소드 목록
-    private final val allowedMethods: Array<String> = arrayOf("GET", "POST", "PUT", "DELETE")
+    private final val allowedMethods: Array<String> = arrayOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
 
     /**
      * Security 설정

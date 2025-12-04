@@ -99,7 +99,7 @@ open class TokenProvider(
             throw TokenValidationException("토큰이 유효하지 않습니다.")
         }
         catch(e: ExpiredJwtException) {
-            throw TokenValidationException("토큰이 유효 기간이 만료되었습니다.")
+            throw TokenValidationException("토큰 유효 기간이 만료되었습니다.")
         }
         catch(e: UnsupportedJwtException) {
             throw TokenValidationException("지원하지 않는 토큰입니다.")

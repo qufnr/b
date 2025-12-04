@@ -11,7 +11,7 @@ Content-Type: application/json
 
 POST {{url}}member-management/signs
 Content-Type: application/json
-X-BServer-Sign-Authentication: Bearer {{bearer.sign}}
+X-BServer-Sign-Authorization: Bearer {{bearer.sign}}
 
 {
     "password": "1234"

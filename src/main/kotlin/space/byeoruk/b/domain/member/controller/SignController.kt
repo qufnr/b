@@ -27,15 +27,15 @@ class SignController(private val signService: SignService) {
 
     @Operation(summary = "로그인", description = "계정으로 로그인합니다.")
     @PostMapping
-    fun sign(@RequestBody request: SignDto.Request, @RequestHeader("X-BServer-Sign-Authentication") authentication: String): ResponseEntity<*> {
-        val response = ResponseDto.build(signService.sign(request, authentication), HttpStatus.CREATED)
+    fun sign(@RequestBody request: SignDto.Request, @RequestHeader("X-BServer-Sign-Authorization") authorization: String): ResponseEntity<*> {
+        val response = ResponseDto.build(signService.sign(request, authorization), HttpStatus.CREATED)
 
         return ResponseEntity.status(response.status).body(response)
     }
 
     @Operation(summary = "토큰 리프레시", description = "접근 토큰을 다시 발급 받습니다.")
     @PostMapping("/refresh")
-    fun refresh(@RequestHeader("X-BServer-Refresh-Authentication") token: String): ResponseEntity<*> {
+    fun refresh(@RequestHeader("X-BServer-Refresh-Authorization") token: String): ResponseEntity<*> {
         val response = ResponseDto.build(signService.refresh(token), HttpStatus.CREATED)
 
         return ResponseEntity.status(response.status).body(response)

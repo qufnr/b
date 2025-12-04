@@ -46,12 +46,12 @@ class SignService(
      * 사용자 로그인
      *
      * @param request 요청 정보 (비밀번호)
-     * @param authentication 로그인 토큰 문자열
+     * @param authorization 로그인 토큰 문자열
      * @return 로그인 정보 (접근 토큰, 리프레시 토큰, 사용자 기본 정보)
      */
     @MemberAction(MemberHistoryType.SIGN)
-    fun sign(request: SignDto.Request, authentication: String): SignDto.Details {
-        val token = tokenProvider.getBearerToken(authentication)
+    fun sign(request: SignDto.Request, authorization: String): SignDto.Details {
+        val token = tokenProvider.getBearerToken(authorization)
         if(!tokenProvider.isValidToken(token))
             throw TokenValidationException("잘못된 토큰입니다.")
 
