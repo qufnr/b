@@ -6,5 +6,6 @@ import space.byeoruk.b.domain.member.model.MemberHistoryType
 @Retention(AnnotationRetention.RUNTIME)
 annotation class MemberAction (
     val type: MemberHistoryType,
+    val message: String = "",
     val trackUpdates: Boolean = false
 )

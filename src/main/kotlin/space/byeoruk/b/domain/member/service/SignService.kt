@@ -26,6 +26,7 @@ class SignService(
      * @param request 요청 정보 (계정 ID)
      * @return 사용자 ID 에 대한 상세 정보
      */
+    @MemberAction(MemberHistoryType.ID_SIGN)
     fun signId(request: SignDto.IdRequest): SignDto.IdDetails {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow{ MemberNotFoundException() }
