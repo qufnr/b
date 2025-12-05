@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* 기본 리셋 */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f1f3f4;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: #202124;
+        }
+        a {
+            color: inherit;
+        }
+        /* 메인 컨테이너 */
+        .wrapper {
+            width: 100%;
+            padding: 24px 0;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #dadce0;
+            box-sizing: border-box;
+            padding: 32px 32px 24px 32px;
+        }
+        /* 헤더 영역 */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .logo-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #1a73e8;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        .service-name {
+            font-size: 18px;
+            font-weight: 500;
+            color: #202124;
+        }
+        /* 제목 */
+        .title {
+            font-size: 22px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #202124;
+        }
+        /* 본문 */
+        .content-main {
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+            color: #202124;
+        }
+        .content-sub {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            color: #5f6368;
+        }
+        /* 버튼 */
+        .button-wrapper {
+            margin: 24px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #1a73e8;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        /* 코드 박스 (인증 코드 등) */
+        .code-label {
+            font-size: 13px;
+            color: #202124;
+            margin-bottom: 8px;
+        }
+        .code-box {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 4px;
+            background-color: #f1f3f4;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: #202124;
+            margin-bottom: 24px;
+        }
+        /* 구분선 */
+        .divider {
+            border-top: 1px solid #e0e0e0;
+            margin: 24px 0 16px 0;
+        }
+        /* 푸터 */
+        .footer {
+            font-size: 11px;
+            color: #80868b;
+            line-height: 1.6;
+        }
+        .footer-links {
+            margin-top: 6px;
+        }
+        .footer-links a {
+            color: #1a73e8;
+            text-decoration: none;
+            margin-right: 8px;
+        }
+        /* 모바일 대응 */
+        @media only screen and (max-width: 600px) {
+            .container {
+                padding: 24px 16px 16px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+
+        <!-- 헤더 -->
+        <div class="header">
+            <!-- 서비스명 첫 글자를 로고처럼 사용 -->
+            <div class="logo-circle">
+                {{appNameInitial}}
+            </div>
+            <div class="service-name">
+                {{appName}}
+            </div>
+        </div>
+
+        <!-- 제목 -->
+        <div class="title">
+            {{title}}
+        </div>
+
+        <!-- 본문 메인 -->
+        <div class="content-main">
+            {{message}}
+        </div>
+
+        <!-- 부가 안내 -->
+        <div class="content-sub">
+            {{messageSecondary}}
+        </div>
+
+        <!-- 액션 버튼 (링크 기반) -->
+        <div class="button-wrapper" style="display: {{actionUrlVisible}}">
+            <a href="{{actionUrl}}" class="button" target="_blank" rel="noopener noreferrer">
+                {{actionText}}
+            </a>
+        </div>
+
+        <!-- 또는 인증 코드(숫자 6자리 등)를 함께 사용할 수도 있음 -->
+        <div class="code-label" style="display: {{codeVisible}}">
+            인증 코드:
+        </div>
+        <div class="code-box" style="display: {{codeVisible}}">
+            {{code}}
+        </div>
+
+        <!-- 구분선 -->
+        <div class="divider"></div>
+
+        <!-- 푸터 -->
+        <div class="footer">
+            이 메일은 {{serviceName}}에서 발송되었습니다. 이 요청을 본인이 수행하지 않으셨다면,
+            계정 보안을 위해 비밀번호를 변경하시거나 관리자({{contactMail}})에게 문의해 주시기 바랍니다.<br><br>
+
+            답장해도 응답되지 않는 발신 전용 메일 주소입니다.
+            문의가 필요하신 경우 앱 내의 도움말을 이용해 주시기 바랍니다.
+
+            <div class="footer-links">
+                <!-- 필요 시 링크 치환해서 사용 -->
+                <a href="{{helpUrl}}" target="_blank" rel="noopener noreferrer">도움말</a>
+                <a href="{{securityUrl}}" target="_blank" rel="noopener noreferrer">보안 설정</a>
+            </div>
+
+            <br>
+            © {{year}} {{serviceName}}. All rights reserved.
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

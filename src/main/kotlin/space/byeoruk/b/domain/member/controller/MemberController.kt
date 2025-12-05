@@ -64,4 +64,11 @@ class MemberController(private val memberService: MemberService) {
     fun canUse(request: MemberDto.CanUseRequest): ResponseEntity<*> {
         return ResponseEntity.ok().body(memberService.canUse(request))
     }
+
+    @Operation(summary = "계정 ID 또는 비밀번호 찾기", description = "계정 ID 또는 비밀번호를 잊어버렸을 때 찾아줍니다.")
+    @PutMapping("/forget")
+    fun forget(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<Void> {
+        memberService.forget(request)
+        return ResponseEntity.noContent().build()
+    }
 }

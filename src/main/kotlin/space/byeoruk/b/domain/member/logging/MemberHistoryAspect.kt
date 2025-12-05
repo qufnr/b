@@ -44,13 +44,19 @@ class MemberHistoryAspect(
                 MemberHistoryType.ACCOUNT_RESOURCE_UPDATED
             )
 
-            val record: MemberHistoryDto.RecordMap =
-                if(beforeAfterSaveTypes.contains(memberAction.type))
+            //  이전, 이후 값이 변경된 사항이 있으면 계정 활동 기록에 저장
+            if(beforeAfterSaveTypes.contains(memberAction.type) &&
+                beforeMap != null && afterMap != null &&
+                beforeMap != afterMap) {
+                memberHistoryRecorder.record(resolvedMember,
                     MemberHistoryDto.RecordMap(memberAction.type, beforeMap, afterMap, getHistoryMessage(memberAction))
-                else
-                    MemberHistoryDto.RecordMap(memberAction.type, getHistoryMessage(memberAction))
+                )
+                return result
+            }
 
-            memberHistoryRecorder.record(resolvedMember, record)
+            memberHistoryRecorder.record(resolvedMember,
+                MemberHistoryDto.RecordMap(memberAction.type, getHistoryMessage(memberAction))
+            )
         }
 
         return result

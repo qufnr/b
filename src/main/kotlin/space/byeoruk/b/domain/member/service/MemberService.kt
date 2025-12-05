@@ -11,16 +11,20 @@ import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
+import space.byeoruk.b.domain.member.model.MemberForgetType
 import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
+import space.byeoruk.b.infra.mail.dto.MailDto
+import space.byeoruk.b.infra.mail.service.MailSender
 
 @Service
 class MemberService(
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
+    private val mailSender: MailSender,
     private val memberAvatarProvider: MemberAvatarProvider,
     private val memberBannerProvider: MemberBannerProvider
 ) {
@@ -119,5 +123,60 @@ class MemberService(
         }.orElse(null)
 
         return MemberDto.CanUseResponse(member == null)
+    }
+
+    /**
+     * 계정 ID 또는 비밀번호 찾기
+     *
+     * @param request 요청 정보
+     * @return 계정 정보
+     */
+    @Transactional
+    fun forget(request: MemberDto.ForgetRequest): MemberDto.Details {
+        val member = memberRepository.findByIdOrEmail(request.value, request.value)
+            .orElseThrow { MemberNotFoundException() }
+
+        return when(request.type) {
+            MemberForgetType.ID -> sendForgetIdMail(member)
+            MemberForgetType.PASSWORD -> sendForgetPasswordMail(member)
+        }
+    }
+
+    /**
+     * 계정 ID 찾기
+     *
+     * @param member 계정 Entity
+     * @return 계정 정보
+     */
+    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_ID)
+    private fun sendForgetIdMail(member: Member): MemberDto.Details {
+        val memberDetails = MemberDto.Details.fromEntity(member)
+
+        mailSender.send(member.email, MailDto.Content(
+            subject = "기억에서 잠깐 사라졌던 계정을 찾았어요!",
+            message = "${memberDetails.getMaskedId()}(으)로 계정을 만들었고, ${memberDetails.getMaskedEmail()} 이메일을 사용하고 있어요."
+        ))
+
+        return memberDetails
+    }
+
+    /**
+     * 계정 비밀번호 찾기
+     *
+     * @param member 계정 Entity
+     * @return 계정 정보
+     */
+    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
+    private fun sendForgetPasswordMail(member: Member): MemberDto.Details {
+        val memberDetails = MemberDto.Details.fromEntity(member)
+
+        //  TODO :: 인증번호 발급 후 비밀번호 초기화 URL 재공
+
+        mailSender.send(member.email, MailDto.Content(
+            subject = "계정 비밀번호를 잊어버리셨나요?",
+            message = ""
+        ))
+
+        return memberDetails
     }
 }

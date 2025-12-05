@@ -51,8 +51,9 @@ class SecurityConfiguration(
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()               //  로그인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
-                .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()              //  계정 찾기
+                .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()              //  계정 조회
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members/can-use").permitAll()      //  계정 ID 또는 이메일 사용 가능 여부 확인
+                .requestMatchers(HttpMethod.PUT, "/api/member-management/members/forget").permitAll()       //  계정 찾기
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()             //  계정 생성
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()          //  계정 수정
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members/resource").authenticated() //  계정 리소스 수정

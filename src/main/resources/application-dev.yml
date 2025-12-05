@@ -26,6 +26,18 @@ spring:
       hibernate.format_sql: true
       # 쿼리 콘솔에 색깔로 표시
       hibernate.highlight_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: byeoruk.space@gmail.com
+    password: zxdq rxkx neob kkqa
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
 # 개인 설정
 bserver:
   # 앱 URL

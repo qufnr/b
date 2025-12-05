@@ -6,8 +6,11 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberCanUseType
+import space.byeoruk.b.domain.member.model.MemberForgetType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
+import space.byeoruk.b.global.utility.StringUtilities
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 class MemberDto {
@@ -41,7 +44,7 @@ class MemberDto {
      * 계정 수정
      */
     class UpdateRequest(
-        @Schema(description = "계정 이름", example = "김수한무")
+        @Schema(description = "계정 이름", example = "아리텐동")
         @Size(max = 16)
         val name: String,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
@@ -65,7 +68,7 @@ class MemberDto {
     class CanUseRequest(
         @Schema(description = "유형 (ID | EMAIL)", example = "EMAIL")
         val type: MemberCanUseType,
-        @Schema(description = "확인 값", example = "user@example.com")
+        @Schema(description = "확인 값", example = "aris@kivotos.jp")
         val value: String
     )
 
@@ -78,6 +81,16 @@ class MemberDto {
     )
 
     /**
+     * 계정 ID 또는 비밀번호 찾기 요청
+     */
+    class ForgetRequest(
+        @Schema(description = "찾기 유형", example = "ID")
+        val type: MemberForgetType,
+        @Schema(description = "찾으려고 하는 계정의 ID 또는 이메일", example = "aris@kivotos.jp")
+        val value: String,
+    )
+
+    /**
      * 기본 계정 조회
      */
     class Details(
@@ -85,21 +98,39 @@ class MemberDto {
         val uid: Long,
         @Schema(description = "계정 ID", example = "username1234")
         val id: String,
-        @Schema(description = "계정 이름", example = "김수한무")
+        @Schema(description = "계정 이메일", example = "aris@kivotos.jp")
+        val email: String,
+        @Schema(description = "계정 이름", example = "아리텐스동동스")
         val name: String?,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
         val bio: String?,
         @Schema(description = "아바타 이미지 파일", example = "filename.jpg")
-        val avatar: String?,
+        val avatar: String? = "",
         @Schema(description = "배너 이미지 파일", example = "filename.jpg")
-        val banner: String?,
+        val banner: String? = "",
         @Schema(description = "마지막 로그인 날짜")
         val lastSignedAt: LocalDateTime,
         @Schema(description = "마지막 계정 이름 변경 날짜")
         val lastNameChangedAt: LocalDateTime?,
+        @Schema(description = "탄생일", example = "2025-03-30")
+        val birthday: LocalDate? = null,
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
     ) {
+        /**
+         * 마스킹된 계정 ID 반환
+         *
+         * @return 마스킹된 계정 ID
+         */
+        fun getMaskedId(): String = StringUtilities.mask(id)
+
+        /**
+         * 마스킹된 계정 이메일 반환
+         *
+         * @return 마스킹된 계정 이메일
+         */
+        fun getMaskedEmail(): String = StringUtilities.maskEmail(email)
+
         companion object {
             /**
              * 계정 Entity 를 MemberDto.Details 로 변환
@@ -111,12 +142,14 @@ class MemberDto {
                 return Details(
                     member.uid,
                     member.id,
+                    member.email,
                     member.name,
                     member.bio,
                     member.avatar,
                     member.banner,
                     member.lastSignedAt,
                     member.lastNameChangedAt,
+                    member.birthday,
                     MemberPrivacyDto.Details.fromEntity(member.privacy),
                     member.authorities.map { authority -> authority.authority }.toList()
                 )
@@ -135,6 +168,7 @@ class MemberDto {
                 "member.bio" to member.bio,
                 "member.avatar" to member.avatar,
                 "member.banner" to member.banner,
+                "member.birthday" to member.birthday,
                 "member.privacy.isPublic" to member.privacy.isPublic,
                 "member.privacy.isBirthdayPublic" to member.privacy.isBirthdayPublic,
             )
