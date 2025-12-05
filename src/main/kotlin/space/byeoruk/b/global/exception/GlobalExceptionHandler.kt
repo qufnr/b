@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
+import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.transaction.TransactionSystemException
 import org.springframework.validation.BindException
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.servlet.NoHandlerFoundException
 import space.byeoruk.b.global.dto.ResponseDto
 import space.byeoruk.b.global.dto.ValidationDto
+import space.byeoruk.b.security.exception.TokenValidationException
 import java.util.stream.Collectors
 
 private val log = KotlinLogging.logger {}
@@ -71,6 +73,26 @@ class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     fun handleException(e: AuthenticationException): ResponseEntity<*> {
         log.error(e) { "인증 실패 예외" }
+
+        val response = ResponseDto.build(HttpStatus.UNAUTHORIZED, e.message!!)
+        return ResponseEntity.status(response.status)
+            .body(response)
+    }
+
+    @ExceptionHandler(BadCredentialsException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleException(e: BadCredentialsException): ResponseEntity<*> {
+        log.error(e) { "인증 실패 예외" }
+
+        val response = ResponseDto.build(HttpStatus.UNAUTHORIZED, e.message!!)
+        return ResponseEntity.status(response.status)
+            .body(response)
+    }
+
+    @ExceptionHandler(TokenValidationException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun handleException(e: TokenValidationException): ResponseEntity<*> {
+        log.error(e) { "토큰 검증 실패 에외" }
 
         val response = ResponseDto.build(HttpStatus.UNAUTHORIZED, e.message!!)
         return ResponseEntity.status(response.status)
