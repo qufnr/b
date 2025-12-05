@@ -2,6 +2,7 @@ package space.byeoruk.b.domain.member.service
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.details.MemberDetails
@@ -42,6 +43,7 @@ class MemberService(
      * @param request 요청 정보
      * @return 생성된 계정 정보
      */
+    @Transactional
     fun create(request: MemberDto.CreateRequest): MemberDto.Details {
         if(request.password != request.passwordConfirm)
             throw MemberPasswordConfirmMismatchException()
@@ -59,16 +61,15 @@ class MemberService(
      * @param memberDetails 계정 디테일
      */
     @MemberAction(type = MemberHistoryType.ACCOUNT_UPDATED, trackUpdates = true)
-    fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails) {
-        println("계정 수정?")
-
+    @Transactional
+    fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
 
-        println("계정 수정 222?")
-
         member.update(request)
         memberRepository.save(member)
+
+        return MemberDto.Details.fromEntity(member)
     }
 
     /**
@@ -78,6 +79,7 @@ class MemberService(
      * @param file 파일
      * @param memberDetails 계정 디테일
      */
+    @Transactional
     fun update(request: MemberDto.ResourceUpdateRequest, file: MultipartFile, memberDetails: MemberDetails) {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }

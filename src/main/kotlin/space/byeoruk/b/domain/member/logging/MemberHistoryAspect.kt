@@ -1,17 +1,18 @@
 package space.byeoruk.b.domain.member.logging
 
-import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.MemberHistoryDto
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.domain.member.service.MemberHistoryRecorder
 
@@ -22,6 +23,7 @@ class MemberHistoryAspect(
     private val memberHistoryRecorder: MemberHistoryRecorder
 ) {
     @Around("@annotation(memberAction)")
+    @Transactional(readOnly = true)
     fun aroundMemberAction(joinPoint: ProceedingJoinPoint, memberAction: MemberAction): Any? {
         val member = resolveMemberFromContextOrArguments(joinPoint)
 
@@ -36,9 +38,14 @@ class MemberHistoryAspect(
         val afterMap: Map<String, Any?>? = getMemberSnapshots(resolvedMember, memberAction)
 
         if(resolvedMember != null) {
+            //  이전, 이후 값 저장하려는 유형
+            val beforeAfterSaveTypes = arrayOf(
+                MemberHistoryType.ACCOUNT_UPDATED,
+                MemberHistoryType.ACCOUNT_RESOURCE_UPDATED
+            )
+
             val record: MemberHistoryDto.RecordMap =
-                //  이전, 이후 값 비교
-                if(beforeMap != null && afterMap != null && beforeMap != afterMap)
+                if(beforeAfterSaveTypes.contains(memberAction.type))
                     MemberHistoryDto.RecordMap(memberAction.type, beforeMap, afterMap, getHistoryMessage(memberAction))
                 else
                     MemberHistoryDto.RecordMap(memberAction.type, getHistoryMessage(memberAction))
