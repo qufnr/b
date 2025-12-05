@@ -32,9 +32,9 @@ class SignService(
             .orElseThrow{ MemberNotFoundException() }
 
         val claims = mapOf(
-            Pair("uid", member.uid.toString()),
-            Pair("id", member.id),
-            Pair("name", if(member.name == null || member.name!!.isBlank()) member.id else member.name!!),
+            "uid" to member.uid.toString(),
+            "id" to member.id,
+            "name" to if(member.name == null || member.name!!.isBlank()) member.id else member.name!!,
         )
         val token = tokenProvider.createToken(claims, TokenType.SIGN)
         val expiration = tokenProvider.getTokenPayload(token).expiration.time
@@ -102,13 +102,13 @@ class SignService(
     private fun issueTokensByMember(member: Member): SignDto.Details {
         //  접근 토큰 Claims
         val accessClaims = mapOf(
-            Pair("uid", member.uid.toString()),
-            Pair("id", member.id),
-            Pair("authorities", member.authorities.map { authority -> authority.authority.toString() }.toList().joinToString(separator = ","))
+            "uid" to member.uid.toString(),
+            "id" to member.id,
+            "authorities" to member.authorities.map { authority -> authority.authority.toString() }.toList().joinToString(separator = ",")
         )
         //  리프레시 토큰 Claims
         val refreshClaims = mapOf(
-            Pair("uid", member.uid.toString())
+            "uid" to member.uid.toString(),
         )
 
         val accessToken = tokenProvider.createToken(accessClaims, TokenType.ACCESS)
