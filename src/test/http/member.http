@@ -6,8 +6,8 @@ Content-Type: application/json
 {
     "id": "aris1",
     "password": "1234",
-    "passwordConfirm": "12",
-    "email": "aris.tendou@kivotos.jp",
+    "passwordConfirm": "1234",
+    "email": "qufnr@kakao.com",
     "name": "아리텐동",
     "bio": "<p></p>"
 }

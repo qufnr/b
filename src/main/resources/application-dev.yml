@@ -30,7 +30,7 @@ spring:
     host: smtp.gmail.com
     port: 587
     username: byeoruk.space@gmail.com
-    password: zxdq rxkx neob kkqa
+    password: zxdqrxkxneobkkqa
     properties:
       mail:
         smtp:

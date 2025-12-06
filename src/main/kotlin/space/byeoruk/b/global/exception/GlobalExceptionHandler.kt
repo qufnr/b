@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.mail.MailAuthenticationException
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.core.AuthenticationException
@@ -137,6 +138,15 @@ class GlobalExceptionHandler {
 
         return ResponseEntity.status(response.status)
             .body(response)
+    }
+
+    @ExceptionHandler(MailAuthenticationException::class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun handleException(e: MailAuthenticationException): ResponseEntity<*> {
+        log.error(e) { "메일 서버 인증 실패 예외" }
+
+        val response = ResponseDto.build(HttpStatus.INTERNAL_SERVER_ERROR, "메일 서버 인증에 실패했습니다.")
+        return ResponseEntity.status(response.status).body(response)
     }
 
     /**

@@ -10,9 +10,8 @@ import java.time.LocalDate
 @Service
 class MailSender(
     private val mailSender: JavaMailSender,
-
     @Value($$"${spring.application.name}")
-    private val appName: String
+    private var appName: String,
 ) {
     /**
      * 메일 보내기
