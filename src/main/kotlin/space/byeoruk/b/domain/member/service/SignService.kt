@@ -3,21 +3,18 @@ package space.byeoruk.b.domain.member.service
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import space.byeoruk.b.domain.member.annotation.MemberAction
-import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.SignDto
-import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordMismatchException
 import space.byeoruk.b.domain.member.model.MemberHistoryType
+import space.byeoruk.b.domain.member.provider.MemberTokenProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
-import space.byeoruk.b.security.exception.TokenValidationException
 import space.byeoruk.b.security.model.TokenType
-import space.byeoruk.b.security.provider.TokenProvider
 
 @Service
 class SignService(
     private val memberRepository: MemberRepository,
-    private val tokenProvider: TokenProvider,
+    private val memberTokenProvider: MemberTokenProvider,
     private val passwordEncoder: PasswordEncoder
 ) {
     /**
@@ -31,15 +28,7 @@ class SignService(
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow{ MemberNotFoundException() }
 
-        val claims = mapOf(
-            "uid" to member.uid.toString(),
-            "id" to member.id,
-            "name" to if(member.name == null || member.name!!.isBlank()) member.id else member.name!!,
-        )
-        val token = tokenProvider.createToken(claims, TokenType.SIGN)
-        val expiration = tokenProvider.getTokenPayload(token).expiration.time
-
-        return SignDto.IdDetails.build(token, expiration, claims)
+        return memberTokenProvider.issueSignToken(member)
     }
 
     /**
@@ -51,14 +40,8 @@ class SignService(
      */
     @MemberAction(MemberHistoryType.SIGN)
     fun sign(request: SignDto.Request, authorization: String): SignDto.Details {
-        val token = tokenProvider.getBearerToken(authorization)
-        if(!tokenProvider.isValidToken(token))
-            throw TokenValidationException("잘못된 토큰입니다.")
-
-        if(tokenProvider.getTokenType(token) != TokenType.SIGN)
-            throw TokenValidationException("토큰 유형이 올바르지 않습니다.")
-
-        val payload = tokenProvider.getTokenPayload(token)
+        //  Sign ID 토큰 검증
+        val payload = memberTokenProvider.validateToken(authorization, TokenType.SIGN)
 
         val memberUid = payload.get("uid", String::class.java).toLong()
         val member = memberRepository.findById(memberUid)
@@ -67,62 +50,23 @@ class SignService(
         if(!passwordEncoder.matches(request.password, member.password))
             throw MemberPasswordMismatchException()
 
-        return issueTokensByMember(member)
+        return memberTokenProvider.issueTokens(member)
     }
 
     /**
      * 리프레시 토큰으로 접근 토큰 및 리프레시 토큰 재발급
      *
-     * @param token 리프레시 토큰 문자열
+     * @param authorization 리프레시 토큰 문자열
      * @return 로그인 정보 (접근 토큰, 리프레시 토큰, 사용자 기본 정보)
      */
-    fun refresh(token: String): SignDto.Details {
-        val token = tokenProvider.getBearerToken(token)
-        if(!tokenProvider.isValidToken(token))
-            throw TokenValidationException("잘못된 토큰입니다.")
-
-        if(tokenProvider.getTokenType(token) != TokenType.REFRESH)
-            throw TokenValidationException("토큰 유형이 올바르지 않습니다.")
-
-        val payload = tokenProvider.getTokenPayload(token)
+    fun refresh(authorization: String): SignDto.Details {
+        //  리프레시 토큰 검증
+        val payload = memberTokenProvider.validateToken(authorization, TokenType.REFRESH)
 
         val memberUid = payload.get("uid", String::class.java).toLong()
         val member = memberRepository.findById(memberUid)
             .orElseThrow { MemberNotFoundException() }
 
-        return issueTokensByMember(member)
-    }
-
-    /**
-     * 사용자 Entity 로 접근 토큰 및 리프레시 토큰 발급 후 로그인 응답 반환
-     *
-     * @param member 사용자 Entity
-     * @return 로그인 응답
-     */
-    private fun issueTokensByMember(member: Member): SignDto.Details {
-        //  접근 토큰 Claims
-        val accessClaims = mapOf(
-            "uid" to member.uid.toString(),
-            "id" to member.id,
-            "authorities" to member.authorities.map { authority -> authority.authority.toString() }.toList().joinToString(separator = ",")
-        )
-        //  리프레시 토큰 Claims
-        val refreshClaims = mapOf(
-            "uid" to member.uid.toString(),
-        )
-
-        val accessToken = tokenProvider.createToken(accessClaims, TokenType.ACCESS)
-        val accessExpiration = tokenProvider.getTokenPayload(accessToken).expiration.time
-
-        val refreshToken = tokenProvider.createToken(refreshClaims, TokenType.REFRESH)
-        val refreshExpiration = tokenProvider.getTokenPayload(refreshToken).expiration.time
-
-        return SignDto.Details(
-            accessToken,
-            accessExpiration,
-            refreshToken,
-            refreshExpiration,
-            MemberDto.Details.fromEntity(member)
-        )
+        return memberTokenProvider.issueTokens(member)
     }
 }

@@ -41,5 +41,20 @@ class StringUtilities {
 
             return "$visibleLocal$asterisks@$domain"
         }
+
+        /**
+         * 무작위 문자열을 특정 길이 만큼 생성하고 반환
+         *
+         * @param length 문자열 길이
+         * @return 무작위 문자열
+         */
+        fun random(length: Int): String {
+            val chars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+            return buildString(length) {
+                repeat(length) {
+                    append(chars.random())
+                }
+            }
+        }
     }
 }

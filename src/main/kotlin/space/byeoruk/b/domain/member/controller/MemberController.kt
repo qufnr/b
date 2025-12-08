@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.RestController
@@ -52,7 +53,7 @@ class MemberController(private val memberService: MemberService) {
     @Operation(summary = "계정 리소스(아바타, 배너) 수정", description = "계정 아바타 또는 배너를 수정합니다.")
     @PutMapping("/resource")
     fun update(
-        @RequestBody request: MemberDto.ResourceUpdateRequest,
+        @RequestBody request: MemberDto.UpdateResourceRequest,
         @RequestPart file: MultipartFile,
         @AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<Void> {
         memberService.update(request, file, memberDetails)
@@ -76,6 +77,15 @@ class MemberController(private val memberService: MemberService) {
     @PutMapping("/forget/password")
     fun forgetPassword(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<Void> {
         memberService.forgetPassword(request)
+        return ResponseEntity.noContent().build()
+    }
+
+    @Operation(summary = "계정 비밀번호 변경", description = "계정 비밀번호를 변경합니다.")
+    fun updatePassword(
+        @RequestBody request: MemberDto.UpdatePasswordRequest,
+        @RequestHeader("X-BServer-Password-Authorization") authorization: String
+    ): ResponseEntity<Void> {
+        memberService.updatePassword(request, authorization)
         return ResponseEntity.noContent().build()
     }
 }

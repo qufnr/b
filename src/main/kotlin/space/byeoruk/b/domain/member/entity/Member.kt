@@ -12,7 +12,9 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.exception.MemberVerifyKeyAlreadyIssuedException
 import space.byeoruk.b.domain.member.model.MemberRole
+import space.byeoruk.b.domain.member.model.MemberVerifyType
 import space.byeoruk.b.global.entity.BaseEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -65,6 +67,9 @@ class Member(
 
     @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
     val authorities: MutableList<MemberAuthority> = mutableListOf()
+
+    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val verifications: MutableList<MemberVerification> = mutableListOf()
 
 //    @OneToMany(mappedBy = "member", cascade = [CascadeType.ALL], orphanRemoval = true)
 //    val histories: MutableList<MemberHistory> = mutableListOf()
@@ -132,5 +137,20 @@ class Member(
      */
     fun updateBanner(filename: String? = null) {
         banner = filename
+    }
+
+    /**
+     * 인증 정보 추가
+     *
+     * @param type 인증 유형
+     * @param key 인증 키
+     * @param expiration 만료 시간 (분 단위)
+     */
+    fun addVerification(type: MemberVerifyType, key: String, expiration: Long) {
+        //  같은 유형 중복 발급 제어
+        if(verifications.any { it.type == type && it.expiredAt <= LocalDateTime.now() })
+            throw MemberVerifyKeyAlreadyIssuedException()
+
+        verifications.add(MemberVerification(this, type, key, expiration))
     }
 }

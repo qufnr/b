@@ -1,5 +1,6 @@
 package space.byeoruk.b.domain.member.service
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -7,25 +8,36 @@ import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
+import space.byeoruk.b.domain.member.exception.MemberVerifyKeyEncryptFailedException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.model.MemberResourceType
+import space.byeoruk.b.domain.member.model.MemberVerifyType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
+import space.byeoruk.b.domain.member.provider.MemberTokenProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
+import space.byeoruk.b.global.utility.StringUtilities
 import space.byeoruk.b.infra.mail.dto.MailDto
 import space.byeoruk.b.infra.mail.service.MailSender
+import space.byeoruk.b.security.model.TokenType
+import java.util.Base64
 
 @Service
 class MemberService(
+    @Value($$"${bserver.verification.password.expiration}")
+    private val resetPasswordKeyExpiration: Long,
+
     private val memberRepository: MemberRepository,
     private val passwordEncoder: PasswordEncoder,
     private val mailSender: MailSender,
     private val memberAvatarProvider: MemberAvatarProvider,
-    private val memberBannerProvider: MemberBannerProvider
+    private val memberBannerProvider: MemberBannerProvider,
+    private val memberTokenProvider: MemberTokenProvider,
 ) {
     /**
      * 계정 UID 로 정보 조회
@@ -83,7 +95,7 @@ class MemberService(
      * @param memberDetails 계정 디테일
      */
     @Transactional
-    fun update(request: MemberDto.ResourceUpdateRequest, file: MultipartFile, memberDetails: MemberDetails) {
+    fun update(request: MemberDto.UpdateResourceRequest, file: MultipartFile, memberDetails: MemberDetails) {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
 
@@ -148,25 +160,42 @@ class MemberService(
 
     /**
      * 계정 비밀번호 찾기
+     * 비밀번호 확인 인증 키를 생성했다면 사용자 ID 검증 토큰과 함께 응답을 보냅니다.
+     * 이 후에 `/api/member-management/members/password/verification` 에서 인증 키를 검증하고, 비밀번호를 재설정 합니다.
      *
      * @param request 요청 정보
-     * @return 계정 정보
+     * @return 사용자 ID 상세 정보 (사용자 ID 검증과 같은 응답 보냄)
      */
     @Transactional
     @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
-    fun forgetPassword(request: MemberDto.ForgetRequest): MemberDto.Details {
+    fun forgetPassword(request: MemberDto.ForgetRequest): SignDto.IdDetails {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
 
-        val memberDetails = MemberDto.Details.fromEntity(member)
+        val key = StringUtilities.random(6)
+        val encryptedKey =
+            passwordEncoder.encode(Base64.getUrlEncoder().withoutPadding().encodeToString(key.toByteArray()))
+                ?: throw MemberVerifyKeyEncryptFailedException()
 
-        //  TODO :: 인증번호 발급 후 비밀번호 초기화 URL 재공
+        member.addVerification(MemberVerifyType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
 
         mailSender.send(member.email, MailDto.Content(
             subject = "계정 비밀번호를 잊어버리셨나요?",
-            message = ""
+            message = "아래 인증 키를 인증 단계 화면에서 입력해 주세요.",
+            code = key,
+            actionUrl =  "" //  TODO :: 프론트로 바로 이동할 수 있는 URL 을 제공할지 생각 해보기
         ))
 
-        return memberDetails
+        return memberTokenProvider.issueSignToken(member, TokenType.PASSWORD)
+    }
+
+    @Transactional
+    @MemberAction(type = MemberHistoryType.ACCOUNT_PASSWORD_UPDATED)
+    fun updatePassword(request: MemberDto.UpdatePasswordRequest, authorization: String): MemberDto.Details {
+        val payload = memberTokenProvider.validateToken(authorization, TokenType.PASSWORD)
+
+        //  TODO :: Payload 에서 사용자 정보 찾는 로직 추가
+
+        return MemberDto.Details()
     }
 }

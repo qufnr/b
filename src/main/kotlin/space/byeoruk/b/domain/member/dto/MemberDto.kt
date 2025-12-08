@@ -54,11 +54,21 @@ class MemberDto {
     /**
      * 계정 리소스(아바타, 배너) 수정 요청
      */
-    class ResourceUpdateRequest(
+    class UpdateResourceRequest(
         @Schema(description = "리소스 유형 (AVATAR | BANNER)", example = "AVATAR")
         val type: MemberResourceType,
         @Schema(description = "삭제 여부", example = "false")
         val isDelete: Boolean,
+    )
+
+    /**
+     * 계정 비밀번호 변경 요청
+     */
+    class UpdatePasswordRequest(
+        @Schema(description = "변경 비밀번호", example = "1q2w3e4r!!@")
+        val password: String,
+        @Schema(description = "변경 비밀번호 확인", example = "1q2w3e4r!!@")
+        val passwordConfirm: String
     )
 
     /**

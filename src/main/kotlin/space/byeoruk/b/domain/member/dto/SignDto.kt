@@ -18,11 +18,12 @@ class SignDto {
         @Schema(description = "JWT 만료 시간", example = "1234421412")
         val expiration: Long,
     ) {
-        companion object {
-            fun build(token: String, expiration: Long, value: Map<String, String>): IdDetails {
-                return IdDetails(value["id"]!!, value["name"], token, expiration)
-            }
-        }
+        constructor(token: String, expiration: Long, claims: Map<String, String>): this (
+            id = claims["id"]!!,
+            name = claims["name"],
+            token = token,
+            expiration = expiration,
+        )
     }
 
     class Request(

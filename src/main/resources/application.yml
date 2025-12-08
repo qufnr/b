@@ -10,8 +10,14 @@ server:
   port: 8172
 # 전역 개인 설정
 bserver:
+  # 인증 설정
+  verification:
+    password:
+      # 비밀번호 변경 인증 키 만료 시간 (분 단위)
+      expiration: 5
+  # JWT 설정
   jwt:
-    # 만료 시간
+    # 만료 시간 (모두 분 단위)
     expiration:
       # 만료 시간 - 로그인 토큰
       sign: 1
