@@ -10,6 +10,7 @@ import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.member.exception.InvalidVerificationKeyException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.exception.MemberVerifyKeyEncryptFailedException
@@ -21,10 +22,12 @@ import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
 import space.byeoruk.b.domain.member.provider.MemberTokenProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
+import space.byeoruk.b.domain.member.repository.MemberVerificationRepository
 import space.byeoruk.b.global.utility.StringUtilities
 import space.byeoruk.b.infra.mail.dto.MailDto
 import space.byeoruk.b.infra.mail.service.MailSender
 import space.byeoruk.b.security.model.TokenType
+import java.time.LocalDateTime
 import java.util.Base64
 
 @Service
@@ -33,8 +36,11 @@ class MemberService(
     private val resetPasswordKeyExpiration: Long,
 
     private val memberRepository: MemberRepository,
+    private val memberVerificationRepository: MemberVerificationRepository,
+
     private val passwordEncoder: PasswordEncoder,
     private val mailSender: MailSender,
+
     private val memberAvatarProvider: MemberAvatarProvider,
     private val memberBannerProvider: MemberBannerProvider,
     private val memberTokenProvider: MemberTokenProvider,
@@ -189,13 +195,36 @@ class MemberService(
         return memberTokenProvider.issueSignToken(member, TokenType.PASSWORD)
     }
 
+    /**
+     * 비밀번호 변경
+     *
+     * @param request 요청 정보
+     * @param authorization 계정 ID 검증 토큰
+     * @return 사용자 상세 정보
+     */
     @Transactional
     @MemberAction(type = MemberHistoryType.ACCOUNT_PASSWORD_UPDATED)
     fun updatePassword(request: MemberDto.UpdatePasswordRequest, authorization: String): MemberDto.Details {
-        val payload = memberTokenProvider.validateToken(authorization, TokenType.PASSWORD)
+        val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.PASSWORD)
 
-        //  TODO :: Payload 에서 사용자 정보 찾는 로직 추가
+        if(request.password != request.passwordConfirm)
+            throw MemberPasswordConfirmMismatchException()
 
-        return MemberDto.Details()
+        val member = memberRepository.findById(payload["uid"]!! as Long)
+            .orElseThrow { MemberNotFoundException() }
+
+        val verifications = memberVerificationRepository.findValidKeys(member, MemberVerifyType.RESET_PASSWORD)
+        val verification = verifications.firstOrNull { passwordEncoder.matches(request.key, it.key) }
+            ?: throw InvalidVerificationKeyException()
+
+        //  인증 키 사용 처리
+        verification.usedAt = LocalDateTime.now()
+        memberVerificationRepository.save(verification)
+
+        //  비밀번호 변경 처리
+        member.password = passwordEncoder.encode(request.password)!!
+        memberRepository.save(member)
+
+        return MemberDto.Details.fromEntity(member)
     }
 }

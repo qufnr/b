@@ -59,14 +59,14 @@ class MemberTokenProvider(
     }
 
     /**
-     * 토큰 검증
+     * 토큰 검증 후 Payload 반환
      *
      * @param authorization Bearer 토큰
      * @param type 토큰 유형
      * @return 토큰 페이로드
      * @throws TokenValidationException 토큰이 잘못되면 던짐
      */
-    fun validateToken(authorization: String, type: TokenType): Claims {
+    fun getTokenPayload(authorization: String, type: TokenType): Claims {
         val token = tokenProvider.getBearerToken(authorization)
         if(!tokenProvider.isValidToken(token))
             throw TokenValidationException("잘못된 토큰입니다.")

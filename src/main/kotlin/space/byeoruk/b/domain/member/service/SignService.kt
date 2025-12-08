@@ -41,7 +41,7 @@ class SignService(
     @MemberAction(MemberHistoryType.SIGN)
     fun sign(request: SignDto.Request, authorization: String): SignDto.Details {
         //  Sign ID 토큰 검증
-        val payload = memberTokenProvider.validateToken(authorization, TokenType.SIGN)
+        val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.SIGN)
 
         val memberUid = payload.get("uid", String::class.java).toLong()
         val member = memberRepository.findById(memberUid)
@@ -61,7 +61,7 @@ class SignService(
      */
     fun refresh(authorization: String): SignDto.Details {
         //  리프레시 토큰 검증
-        val payload = memberTokenProvider.validateToken(authorization, TokenType.REFRESH)
+        val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.REFRESH)
 
         val memberUid = payload.get("uid", String::class.java).toLong()
         val member = memberRepository.findById(memberUid)

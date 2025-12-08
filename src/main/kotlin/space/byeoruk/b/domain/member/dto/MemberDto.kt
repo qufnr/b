@@ -65,6 +65,8 @@ class MemberDto {
      * 계정 비밀번호 변경 요청
      */
     class UpdatePasswordRequest(
+        @Schema(description = "이메일 인증 키", example = "453648")
+        val key: String,
         @Schema(description = "변경 비밀번호", example = "1q2w3e4r!!@")
         val password: String,
         @Schema(description = "변경 비밀번호 확인", example = "1q2w3e4r!!@")
