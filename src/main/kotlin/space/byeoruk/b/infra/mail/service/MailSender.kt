@@ -22,13 +22,12 @@ class MailSender(
     fun send(to: String, content: MailDto.Content) {
         val message = mailSender.createMimeMessage()
 
-        val helper = MimeMessageHelper(message, true, "UTF-8")
+        val helper = MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, "UTF-8")
         helper.setTo(to)
         helper.setSubject(content.subject)
 
         val template = loadTemplate()
         val html = renderTemplate(template, mapOf(
-            "appNameInitial" to appName[0].toString().uppercase(),
             "appName" to appName,
             "title" to content.subject,
             "message" to content.message,
