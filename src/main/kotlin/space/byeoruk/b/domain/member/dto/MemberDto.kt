@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberCanUseType
-import space.byeoruk.b.domain.member.model.MemberForgetType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.global.utility.StringUtilities
@@ -84,8 +83,6 @@ class MemberDto {
      * 계정 ID 또는 비밀번호 찾기 요청
      */
     class ForgetRequest(
-        @Schema(description = "찾기 유형", example = "ID")
-        val type: MemberForgetType,
         @Schema(description = "찾으려고 하는 계정의 ID 또는 이메일", example = "aris@kivotos.jp")
         val value: String,
     )

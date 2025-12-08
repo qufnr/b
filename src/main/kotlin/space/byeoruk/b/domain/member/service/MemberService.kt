@@ -11,7 +11,6 @@ import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
-import space.byeoruk.b.domain.member.model.MemberForgetType
 import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
@@ -126,30 +125,17 @@ class MemberService(
     }
 
     /**
-     * 계정 ID 또는 비밀번호 찾기
+     * 계정 ID 찾기
      *
      * @param request 요청 정보
      * @return 계정 정보
      */
     @Transactional
+    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET)
     fun forget(request: MemberDto.ForgetRequest): MemberDto.Details {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
 
-        return when(request.type) {
-            MemberForgetType.ID -> sendForgetIdMail(member)
-            MemberForgetType.PASSWORD -> sendForgetPasswordMail(member)
-        }
-    }
-
-    /**
-     * 계정 ID 찾기
-     *
-     * @param member 계정 Entity
-     * @return 계정 정보
-     */
-    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_ID)
-    private fun sendForgetIdMail(member: Member): MemberDto.Details {
         val memberDetails = MemberDto.Details.fromEntity(member)
 
         mailSender.send(member.email, MailDto.Content(
@@ -163,11 +149,15 @@ class MemberService(
     /**
      * 계정 비밀번호 찾기
      *
-     * @param member 계정 Entity
+     * @param request 요청 정보
      * @return 계정 정보
      */
+    @Transactional
     @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
-    private fun sendForgetPasswordMail(member: Member): MemberDto.Details {
+    fun forgetPassword(request: MemberDto.ForgetRequest): MemberDto.Details {
+        val member = memberRepository.findByIdOrEmail(request.value, request.value)
+            .orElseThrow { MemberNotFoundException() }
+
         val memberDetails = MemberDto.Details.fromEntity(member)
 
         //  TODO :: 인증번호 발급 후 비밀번호 초기화 URL 재공
