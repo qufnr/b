@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.entity.Member
-import space.byeoruk.b.domain.member.exception.MemberAvatarNotFoundException
-import space.byeoruk.b.domain.member.exception.MemberResourceTransferFailedException
+import space.byeoruk.b.domain.member.exception.AvatarNotFoundException
+import space.byeoruk.b.domain.member.exception.ResourceTransferFailedException
 import space.byeoruk.b.global.provider.EntityFileProvider
 import space.byeoruk.b.global.provider.ServerResourceProvider
 
@@ -28,11 +28,11 @@ class MemberAvatarProvider(
      * @param file 멀티파트 파일
      * @return 저장된 파일 명
      * @throws space.byeoruk.b.global.exception.FileUtilityException 파일 검증 실패 시 던짐
-     * @throws MemberResourceTransferFailedException 파일 저장 실패 시 던짐
+     * @throws ResourceTransferFailedException 파일 저장 실패 시 던짐
      */
     override fun save(entity: Member, file: MultipartFile): String {
         if(file.isEmpty)
-            throw MemberAvatarNotFoundException()
+            throw AvatarNotFoundException()
 
         super.validate(file, allowedExtensions, maximumSize)
 
@@ -45,7 +45,7 @@ class MemberAvatarProvider(
             return filename
         }
         catch(e: Exception) {
-            throw MemberResourceTransferFailedException(e);
+            throw ResourceTransferFailedException(e);
         }
     }
 

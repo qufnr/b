@@ -12,7 +12,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import space.byeoruk.b.domain.member.dto.MemberDto
-import space.byeoruk.b.domain.member.exception.MemberVerifyKeyAlreadyIssuedException
+import space.byeoruk.b.domain.member.exception.VerificationKeyAlreadyIssuedException
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.domain.member.model.MemberVerifyType
 import space.byeoruk.b.global.entity.BaseEntity
@@ -149,7 +149,7 @@ class Member(
     fun addVerification(type: MemberVerifyType, key: String, expiration: Long) {
         //  같은 유형 중복 발급 제어
         if(verifications.any { it.type == type && it.expiredAt <= LocalDateTime.now() })
-            throw MemberVerifyKeyAlreadyIssuedException()
+            throw VerificationKeyAlreadyIssuedException()
 
         verifications.add(MemberVerification(this, type, key, expiration))
     }

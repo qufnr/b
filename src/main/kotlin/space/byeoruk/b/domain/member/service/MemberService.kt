@@ -12,8 +12,8 @@ import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.InvalidVerificationKeyException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
-import space.byeoruk.b.domain.member.exception.MemberPasswordConfirmMismatchException
-import space.byeoruk.b.domain.member.exception.MemberVerifyKeyEncryptFailedException
+import space.byeoruk.b.domain.member.exception.PasswordConfirmMismatchException
+import space.byeoruk.b.domain.member.exception.VerificationKeyEncryptFailedException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.model.MemberResourceType
@@ -67,7 +67,7 @@ class MemberService(
     @Transactional
     fun create(request: MemberDto.CreateRequest): MemberDto.Details {
         if(request.password != request.passwordConfirm)
-            throw MemberPasswordConfirmMismatchException()
+            throw PasswordConfirmMismatchException()
 
         val member = Member(request)
         member.password = passwordEncoder.encode(request.password).toString()
@@ -181,7 +181,7 @@ class MemberService(
         val key = StringUtilities.random(6)
         val encryptedKey =
             passwordEncoder.encode(Base64.getUrlEncoder().withoutPadding().encodeToString(key.toByteArray()))
-                ?: throw MemberVerifyKeyEncryptFailedException()
+                ?: throw VerificationKeyEncryptFailedException()
 
         member.addVerification(MemberVerifyType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
 
@@ -208,7 +208,7 @@ class MemberService(
         val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.PASSWORD)
 
         if(request.password != request.passwordConfirm)
-            throw MemberPasswordConfirmMismatchException()
+            throw PasswordConfirmMismatchException()
 
         val member = memberRepository.findById(payload["uid"]!! as Long)
             .orElseThrow { MemberNotFoundException() }

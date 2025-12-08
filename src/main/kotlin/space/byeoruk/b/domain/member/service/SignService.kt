@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
-import space.byeoruk.b.domain.member.exception.MemberPasswordMismatchException
+import space.byeoruk.b.domain.member.exception.PasswordMismatchException
 import space.byeoruk.b.domain.member.model.MemberHistoryType
 import space.byeoruk.b.domain.member.provider.MemberTokenProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
@@ -48,7 +48,7 @@ class SignService(
             .orElseThrow { MemberNotFoundException() }
 
         if(!passwordEncoder.matches(request.password, member.password))
-            throw MemberPasswordMismatchException()
+            throw PasswordMismatchException()
 
         return memberTokenProvider.issueTokens(member)
     }
