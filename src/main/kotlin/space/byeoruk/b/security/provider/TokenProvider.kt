@@ -24,6 +24,8 @@ open class TokenProvider(
     private val issuer: String,
     @Value($$"${bserver.jwt.expiration.sign}")
     private val signExpiration: Long,
+    @Value($$"${bserver.jwt.expiration.password}")
+    private val passwordExpiration: Long,
     @Value($$"${bserver.jwt.expiration.access}")
     private val accessExpiration: Long,
     @Value($$"${bserver.jwt.expiration.refresh}")
@@ -148,6 +150,7 @@ open class TokenProvider(
 
         nowDateTime = when(type) {
             TokenType.SIGN -> nowDateTime.plusMinutes(signExpiration)
+            TokenType.PASSWORD -> nowDateTime.plusMinutes(passwordExpiration)
             TokenType.ACCESS -> nowDateTime.plusMinutes(accessExpiration)
             TokenType.REFRESH -> nowDateTime.plusMinutes(refreshExpiration)
         }

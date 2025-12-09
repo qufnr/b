@@ -81,6 +81,7 @@ class MemberController(private val memberService: MemberService) {
     }
 
     @Operation(summary = "계정 비밀번호 변경", description = "계정 비밀번호를 변경합니다.")
+    @PutMapping("/password")
     fun updatePassword(
         @RequestBody request: MemberDto.UpdatePasswordRequest,
         @RequestHeader("X-BServer-Password-Authorization") authorization: String

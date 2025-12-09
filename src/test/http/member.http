@@ -25,11 +25,18 @@ Authorization: Bearer {{bearer.access}}
 ### 계정 ID 또는 이메일 사용 가능 여부 확인
 GET {{url}}member-management/members/can-use?type=ID&value=aris
 
-### 계정 ID 또는 비밀번호 찾기
-PUT {{url}}member-management/members/forget
+### 계정 ID 찾기
+PUT {{url}}member-management/members/forget/id
 Content-Type: application/json
 
 {
-    "type": "ID",
+    "value": "aris1"
+}
+
+### 계정 비밀번호 찾기
+PUT {{url}}member-management/members/forget/password
+Content-Type: application/json
+
+{
     "value": "aris1"
 }
