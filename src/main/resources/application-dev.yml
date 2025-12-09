@@ -19,7 +19,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
     properties:
       show_sql: true
       # 쿼리 포멧
@@ -64,11 +63,15 @@ bserver:
     issuer: http://localhost:5000
 # 로그
 logging:
-  # 쿼리 보여주기
-  org.hibernate.SQL: DEBUG
-  # 쿼리에 바인딩된 값 보기 (? 에 어떤 데이터 들어가는지 볼 수 있음)
-  org.hibernate.orm.jdbc.bind: TRACE
+  level:
+    org:
+      hibernate:
+        orm:
+          jdbc:
+            # 쿼리에 바인딩된 값 보기 (? 에 어떤 데이터 들어가는지 볼 수 있음)
+            bind: TRACE
+    sql: DEBUG
   # Not work???
-  org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  # org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   # 시큐리티 로그
-  org.springframework.security: DEBUG
+  # org.springframework.security: DEBUG

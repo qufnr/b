@@ -14,5 +14,5 @@ Content-Type: application/json
 X-BServer-Sign-Authorization: Bearer {{bearer.sign}}
 
 {
-    "password": "1234"
+    "password": "12345"
 }

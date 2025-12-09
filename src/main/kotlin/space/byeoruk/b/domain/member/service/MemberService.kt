@@ -12,6 +12,7 @@ import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.exception.InvalidVerificationKeyException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
+import space.byeoruk.b.domain.member.exception.NameChangeCooldownException
 import space.byeoruk.b.domain.member.exception.PasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.exception.VerificationKeyEncryptFailedException
 import space.byeoruk.b.domain.member.model.MemberCanUseType
@@ -27,13 +28,16 @@ import space.byeoruk.b.global.utility.StringUtilities
 import space.byeoruk.b.infra.mail.dto.MailDto
 import space.byeoruk.b.infra.mail.service.MailSender
 import space.byeoruk.b.security.model.TokenType
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Base64
+import java.time.temporal.ChronoUnit
 
 @Service
 class MemberService(
     @Value($$"${bserver.verification.password.expiration}")
     private val resetPasswordKeyExpiration: Long,
+    @Value($$"${bserver.name-change-delay}")
+    private val nameChangeDelay: Long,
 
     private val memberRepository: MemberRepository,
     private val memberVerificationRepository: MemberVerificationRepository,
@@ -86,6 +90,17 @@ class MemberService(
     fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
+
+        //  이름 변경 날짜 확인
+        if(request.name != member.name && member.lastNameChangedDate != null) {
+            val nameCanChangeDate = member.lastNameChangedDate!!.plusDays(nameChangeDelay)
+            val now = LocalDate.now()
+
+            if(nameCanChangeDate > now) {
+                val days = ChronoUnit.DAYS.between(now, nameCanChangeDate)
+                throw NameChangeCooldownException(days)
+            }
+        }
 
         member.update(request)
         memberRepository.save(member)
@@ -180,7 +195,7 @@ class MemberService(
 
         val key = StringUtilities.random(6)
         val encryptedKey =
-            passwordEncoder.encode(Base64.getUrlEncoder().withoutPadding().encodeToString(key.toByteArray()))
+            passwordEncoder.encode(key)
                 ?: throw VerificationKeyEncryptFailedException()
 
         member.addVerification(MemberVerifyType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
@@ -210,11 +225,12 @@ class MemberService(
         if(request.password != request.passwordConfirm)
             throw PasswordConfirmMismatchException()
 
-        val member = memberRepository.findById(payload["uid"]!! as Long)
+        //  claims에서 "uid"를 가져오면 형태를 알 수 없기 때문에 캐스팅을 두 번 한다. 매개변수가 String 형태면 계정 ID로 조회함..
+        val member = memberRepository.findById(payload["uid"].toString().toLong())
             .orElseThrow { MemberNotFoundException() }
 
         val verifications = memberVerificationRepository.findValidKeys(member, MemberVerifyType.RESET_PASSWORD)
-        val verification = verifications.firstOrNull { passwordEncoder.matches(request.key, it.key) }
+        val verification = verifications.find { passwordEncoder.matches(request.key, it.key) }
             ?: throw InvalidVerificationKeyException()
 
         //  인증 키 사용 처리

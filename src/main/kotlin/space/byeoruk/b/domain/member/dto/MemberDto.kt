@@ -120,9 +120,14 @@ class MemberDto {
         @Schema(description = "마지막 로그인 날짜")
         val lastSignedAt: LocalDateTime,
         @Schema(description = "마지막 계정 이름 변경 날짜")
-        val lastNameChangedAt: LocalDateTime?,
+        val lastNameChangedDate: LocalDate?,
         @Schema(description = "탄생일", example = "2025-03-30")
         val birthday: LocalDate? = null,
+        @Schema(description = "계정 잠금 여부", example = "false")
+        val isLocked: Boolean,
+        @Schema(description = "계정 활성화 여부", example = "true")
+        val isEnabled: Boolean,
+
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
     ) {
@@ -157,8 +162,10 @@ class MemberDto {
                     member.avatar,
                     member.banner,
                     member.lastSignedAt,
-                    member.lastNameChangedAt,
+                    member.lastNameChangedDate,
                     member.birthday,
+                    member.isLocked,
+                    member.isEnabled,
                     MemberPrivacyDto.Details.fromEntity(member.privacy),
                     member.authorities.map { authority -> authority.authority }.toList()
                 )

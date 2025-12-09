@@ -10,6 +10,7 @@ server:
   port: 8172
 # 전역 개인 설정
 bserver:
+  name-change-delay: 30
   # 인증 설정
   verification:
     password:
@@ -20,9 +21,9 @@ bserver:
     # 만료 시간 (모두 분 단위)
     expiration:
       # ID 검증 토큰 만료 시간
-      sign: 1
+      sign: 5
       # 비밀번호 찾기 토큰 만료 시간
-      password: 1
+      password: 5
       # 접근 토큰 만료 시간
       access: 1440
       # 리프레시 토큰 만료 시간

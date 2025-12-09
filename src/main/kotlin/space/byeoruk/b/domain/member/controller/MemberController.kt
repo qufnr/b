@@ -67,17 +67,17 @@ class MemberController(private val memberService: MemberService) {
     }
 
     @Operation(summary = "계정 ID 찾기", description = "계정 ID를 잊어버렸을 때 찾아줍니다.")
-    @PutMapping("/forget/id")
-    fun forget(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<Void> {
+    @PostMapping("/forget/id")
+    fun forget(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<*> {
         memberService.forget(request)
-        return ResponseEntity.noContent().build()
+        return ResponseEntity.status(HttpStatus.CREATED).body(null)
     }
 
     @Operation(summary = "계정 비밀번호 찾기", description = "계정 비밀번호를 잊어버렸을 때 찾아줍니다.")
-    @PutMapping("/forget/password")
-    fun forgetPassword(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<Void> {
-        memberService.forgetPassword(request)
-        return ResponseEntity.noContent().build()
+    @PostMapping("/forget/password")
+    fun forgetPassword(@RequestBody request: MemberDto.ForgetRequest): ResponseEntity<*> {
+        val response = ResponseDto.build(memberService.forgetPassword(request), HttpStatus.CREATED)
+        return ResponseEntity.status(response.status).body(response)
     }
 
     @Operation(summary = "계정 비밀번호 변경", description = "계정 비밀번호를 변경합니다.")

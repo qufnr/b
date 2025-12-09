@@ -53,9 +53,8 @@ class SecurityConfiguration(
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members").permitAll()              //  계정 조회
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members/can-use").permitAll()      //  계정 ID 또는 이메일 사용 가능 여부 확인
-                .requestMatchers(HttpMethod.PUT, "/api/member-management/members/forget/id").permitAll()    //  계정 찾기
-                .requestMatchers(HttpMethod.PUT, "/api/member-management/members/forget/password").permitAll()  //  계정 비밀번호 찾기
-                .requestMatchers(HttpMethod.PUT, "/api/member-management/members/password/verification").permitAll()   //  계정 비밀번호 초기화 전 인증
+                .requestMatchers(HttpMethod.POST, "/api/member-management/members/forget/id").permitAll()    //  계정 찾기
+                .requestMatchers(HttpMethod.POST, "/api/member-management/members/forget/password").permitAll()  //  계정 비밀번호 찾기
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members/password").permitAll()     //  계정 비밀번호 초기화
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()             //  계정 생성
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()          //  계정 수정

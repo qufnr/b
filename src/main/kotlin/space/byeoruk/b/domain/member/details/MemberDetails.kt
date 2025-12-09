@@ -12,6 +12,8 @@ class MemberDetails(
     private val uid: Long,
     private val id: String,
     private val password: String,
+    private val isNonLocked: Boolean,
+    private val isEnabled: Boolean,
 ): UserDetails {
     private var authorities: List<MemberRole> = emptyList()
 
@@ -19,6 +21,8 @@ class MemberDetails(
         uid = member.uid,
         id = member.id,
         password = password,
+        isNonLocked = !member.isLocked,
+        isEnabled = member.isEnabled,
     ) {
         this.authorities = member.authorities
     }
@@ -40,7 +44,7 @@ class MemberDetails(
     }
 
     override fun isAccountNonLocked(): Boolean {
-        return true //  TODO :: 계정 잠금 여부 만들기
+        return isNonLocked
     }
 
     override fun isAccountNonExpired(): Boolean {
@@ -52,6 +56,6 @@ class MemberDetails(
     }
 
     override fun isEnabled(): Boolean {
-        return true
+        return isEnabled
     }
 }
