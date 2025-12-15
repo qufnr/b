@@ -26,6 +26,12 @@ import space.byeoruk.b.global.dto.ResponseDto
 @RestController
 class MemberController(private val memberService: MemberService) {
 
+    @Operation(summary = "계정 조회", description = "인증된 계정 정보로 계정을 다시 조회합니다.")
+    @GetMapping
+    fun read(@AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<*> {
+        return ResponseEntity.ok().body(ResponseDto.build(memberService.read(memberDetails), HttpStatus.OK))
+    }
+
     @Operation(summary = "계정 조회", description = "계정 UID 로 상세 계정 정보를 조회합니다.")
     @GetMapping("/{uid}")
     fun read(

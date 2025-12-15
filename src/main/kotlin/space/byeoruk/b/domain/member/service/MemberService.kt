@@ -50,6 +50,19 @@ class MemberService(
     private val memberTokenProvider: MemberTokenProvider,
 ) {
     /**
+     * 시큐리티 콘텍스트에 담긴 Principal 로 계정 정보 조회
+     *
+     * @param memberDetails 인증된 계정 정보
+     * @return 계정 상세 정보
+     */
+    fun read(memberDetails: MemberDetails): MemberDto.Details {
+        val member = memberRepository.findById(memberDetails.username)
+            .orElseThrow { MemberNotFoundException() }
+
+        return MemberDto.Details.fromEntity(member)
+    }
+
+    /**
      * 계정 UID 로 정보 조회
      *
      * @param uid 계정 UID
