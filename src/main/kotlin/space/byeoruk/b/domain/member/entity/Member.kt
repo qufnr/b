@@ -16,6 +16,7 @@ import space.byeoruk.b.domain.member.exception.VerificationKeyAlreadyIssuedExcep
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.domain.member.model.MemberVerifyType
 import space.byeoruk.b.global.entity.BaseEntity
+import space.byeoruk.b.global.utility.ColourUtilities
 import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.Long
@@ -43,6 +44,9 @@ class Member(
 
     @Column(name = "bio", length = 512, comment = "설명")
     var bio: String? = null,
+
+    @Column(name = "colour", updatable = false, length = 8, comment = "색상")
+    var colour: String,
 
     @Column(name = "avatar", length = 512, comment = "아바타 (파일명)")
     var avatar: String? = null,
@@ -88,6 +92,7 @@ class Member(
         password = request.password,
         name = request.name,
         bio = request.bio,
+        colour = ColourUtilities.random(),
         privacy = MemberPrivacy()
     ) {
         addAuthority(MemberRole.ROLE_MEMBER)

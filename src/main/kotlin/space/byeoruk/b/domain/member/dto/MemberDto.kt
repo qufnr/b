@@ -113,6 +113,8 @@ class MemberDto {
         val name: String?,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
         val bio: String?,
+        @Schema(description = "색상", example = "#FFFF00")
+        val colour: String,
         @Schema(description = "아바타 이미지 파일", example = "filename.jpg")
         val avatar: String? = "",
         @Schema(description = "배너 이미지 파일", example = "filename.jpg")
@@ -159,6 +161,7 @@ class MemberDto {
                     member.email,
                     member.name,
                     member.bio,
+                    member.colour,
                     member.avatar,
                     member.banner,
                     member.lastSignedAt,
