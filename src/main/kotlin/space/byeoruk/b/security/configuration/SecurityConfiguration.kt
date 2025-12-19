@@ -60,6 +60,8 @@ class SecurityConfiguration(
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members").permitAll()             //  계정 생성
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members").authenticated()          //  계정 수정
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members/resource").authenticated() //  계정 리소스 수정
+                .requestMatchers(HttpMethod.PUT, "/api/member-management/members/verify/email").authenticated()         //  계정 이메일 인증
+                .requestMatchers(HttpMethod.POST, "/api/member-management/members/verify/email/send").authenticated()   //  계정 이메일 인증 키 전송
                 .anyRequest().denyAll()
             }
             .exceptionHandling { configurer -> configurer

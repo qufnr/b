@@ -8,8 +8,10 @@ import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.dto.MemberVerificationDto
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.member.exception.AlreadyMemberMailVerifiedException
 import space.byeoruk.b.domain.member.exception.InvalidVerificationKeyException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.NameChangeCooldownException
@@ -34,8 +36,13 @@ import java.time.temporal.ChronoUnit
 
 @Service
 class MemberService(
+    //  비밀번호 초기화 전 인증 키 유효 시간 (분)
     @Value($$"${bserver.verification.password.expiration}")
     private val resetPasswordKeyExpiration: Long,
+    //  이메일 인증 키 유효 시간 (분)
+    @Value($$"${bserver.verification.email.expiration}")
+    private val emailVerifyKeyExpiration: Long,
+    //  이름 변경 딜레이 (일)
     @Value($$"${bserver.name-change-delay}")
     private val nameChangeDelay: Long,
 
@@ -98,8 +105,8 @@ class MemberService(
      * @param request 요청 정보
      * @param memberDetails 계정 디테일
      */
-    @MemberAction(type = MemberHistoryType.ACCOUNT_UPDATED, trackUpdates = true)
     @Transactional
+    @MemberAction(type = MemberHistoryType.ACCOUNT_UPDATED, trackUpdates = true)
     fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
@@ -177,7 +184,7 @@ class MemberService(
      * @return 계정 정보
      */
     @Transactional
-    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET)
+    @MemberAction(MemberHistoryType.ACCOUNT_FORGET)
     fun forget(request: MemberDto.ForgetRequest): MemberDto.Details {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
@@ -201,7 +208,7 @@ class MemberService(
      * @return 사용자 ID 상세 정보 (사용자 ID 검증과 같은 응답 보냄)
      */
     @Transactional
-    @MemberAction(type = MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
+    @MemberAction(MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
     fun forgetPassword(request: MemberDto.ForgetRequest): SignDto.IdDetails {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
@@ -231,7 +238,7 @@ class MemberService(
      * @return 사용자 상세 정보
      */
     @Transactional
-    @MemberAction(type = MemberHistoryType.ACCOUNT_PASSWORD_UPDATED)
+    @MemberAction(MemberHistoryType.ACCOUNT_PASSWORD_UPDATED)
     fun updatePassword(request: MemberDto.UpdatePasswordRequest, authorization: String): MemberDto.Details {
         val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.PASSWORD)
 
@@ -254,6 +261,39 @@ class MemberService(
         member.password = passwordEncoder.encode(request.password)!!
         memberRepository.save(member)
 
+        return MemberDto.Details.fromEntity(member)
+    }
+
+    @Transactional
+    fun sendVerifyEmail(memberDetails: MemberDetails): MemberVerificationDto.Details {
+        val member = memberRepository.findById(memberDetails.username)
+            .orElseThrow { MemberNotFoundException() }
+
+        if(member.isVerified)
+            throw AlreadyMemberMailVerifiedException()
+
+        val key = passwordEncoder.encode(StringUtilities.random(6))!!
+
+        val verification = member.addVerification(MemberVerifyType.EMAIL_VERIFICATION, key, emailVerifyKeyExpiration)
+        memberRepository.save(member)
+
+        return verification
+    }
+
+    @Transactional
+    @MemberAction(MemberHistoryType.ACCOUNT_EMAIL_VERIFY)
+    fun verifyEmail(request: MemberDto.VerifyEmailRequest, memberDetails: MemberDetails): MemberDto.Details {
+        val member = memberRepository.findById(memberDetails.username)
+            .orElseThrow { MemberNotFoundException() }
+
+        val verifications = memberVerificationRepository.findValidKeys(member, MemberVerifyType.EMAIL_VERIFICATION)
+        val verification = verifications.find { passwordEncoder.matches(request.key, it.key) }
+            ?: throw InvalidVerificationKeyException()
+
+        verification.usedAt = LocalDateTime.now()
+        member.isVerified = true
+
+        memberRepository.save(member)
         return MemberDto.Details.fromEntity(member)
     }
 }

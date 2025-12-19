@@ -8,7 +8,8 @@ import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
-import space.byeoruk.b.global.utility.StringUtilities
+import space.byeoruk.b.global.utility.StringUtilities.mask
+import space.byeoruk.b.global.utility.StringUtilities.maskEmail
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -100,6 +101,14 @@ class MemberDto {
     )
 
     /**
+     * 이메일 인증 요청
+     */
+    class VerifyEmailRequest (
+        @Schema(description = "인증 키", example = "F127FBV")
+        val key: String,
+    )
+
+    /**
      * 기본 계정 조회
      */
     class Details(
@@ -129,6 +138,8 @@ class MemberDto {
         val isLocked: Boolean,
         @Schema(description = "계정 활성화 여부", example = "true")
         val isEnabled: Boolean,
+        @Schema(description = "계정 인증 여부", example = "true")
+        val isVerified: Boolean,
 
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
@@ -138,14 +149,14 @@ class MemberDto {
          *
          * @return 마스킹된 계정 ID
          */
-        fun getMaskedId(): String = StringUtilities.mask(id)
+        fun getMaskedId(): String = id.mask()
 
         /**
          * 마스킹된 계정 이메일 반환
          *
          * @return 마스킹된 계정 이메일
          */
-        fun getMaskedEmail(): String = StringUtilities.maskEmail(email)
+        fun getMaskedEmail(): String = email.maskEmail()
 
         companion object {
             /**
@@ -169,6 +180,7 @@ class MemberDto {
                     member.birthday,
                     member.isLocked,
                     member.isEnabled,
+                    member.isVerified,
                     MemberPrivacyDto.Details.fromEntity(member.privacy),
                     member.authorities.map { authority -> authority.authority }.toList()
                 )

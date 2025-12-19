@@ -12,5 +12,6 @@ enum class MemberHistoryType(val description: String) {
     ACCOUNT_UPDATED("계정 정보 업데이트"),
     ACCOUNT_RESOURCE_UPDATED("계정 리소스 업데이트"),
     ACCOUNT_PRIVACY_UPDATED("계정 프라이버시 업데이트"),
-    ACCOUNT_PASSWORD_UPDATED("계정 비밀번호 업데이트")
+    ACCOUNT_PASSWORD_UPDATED("계정 비밀번호 업데이트"),
+    ACCOUNT_EMAIL_VERIFY("계정 이메일 인증")
 }

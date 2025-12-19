@@ -95,4 +95,21 @@ class MemberController(private val memberService: MemberService) {
         memberService.updatePassword(request, authorization)
         return ResponseEntity.noContent().build()
     }
+
+    @Operation(summary = "이메일 인증 키 전송", description = "이메일 인증 키를 보냅니다.")
+    @PostMapping("/verify/email/send")
+    fun sendVerifyEmail(@AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<*> {
+        val response = ResponseDto.build(memberService.sendVerifyEmail(memberDetails), HttpStatus.CREATED)
+        return ResponseEntity.status(response.status).body(response)
+    }
+
+    @Operation(summary = "이메일 인증", description = "발급 받은 인증 키로 이메일을 인증합니다.")
+    @PutMapping("/verify/email")
+    fun verifyEmail(
+        @RequestBody request: MemberDto.VerifyEmailRequest,
+        @AuthenticationPrincipal memberDetails: MemberDetails
+    ): ResponseEntity<Void> {
+        memberService.verifyEmail(request, memberDetails)
+        return ResponseEntity.noContent().build()
+    }
 }

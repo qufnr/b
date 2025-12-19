@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.dto.MemberVerificationDto
 import space.byeoruk.b.domain.member.exception.VerificationKeyAlreadyIssuedException
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.domain.member.model.MemberVerifyType
@@ -68,6 +69,9 @@ class Member(
 
     @Column(name = "is_enabled", comment = "계정 활성화 여부")
     var isEnabled: Boolean = true,
+
+    @Column(name = "is_verified")
+    var isVerified: Boolean = false,
 
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinColumn(name = "member_privacy_uid", foreignKey = ForeignKey(name = "FK_member_TO_member_privacy"))
@@ -155,12 +159,16 @@ class Member(
      * @param type 인증 유형
      * @param key 인증 키
      * @param expiration 만료 시간 (분 단위)
+     * @return 추가된 인증 정보 디테일
      */
-    fun addVerification(type: MemberVerifyType, key: String, expiration: Long) {
+    fun addVerification(type: MemberVerifyType, key: String, expiration: Long): MemberVerificationDto.Details {
         //  같은 유형 중복 발급 제어
         if(verifications.any { it.type == type && it.expiredAt > LocalDateTime.now() })
             throw VerificationKeyAlreadyIssuedException()
 
-        verifications.add(MemberVerification(this, type, key, expiration))
+        val memberVerification = MemberVerification(this, type, key, expiration)
+        verifications.add(memberVerification)
+
+        return MemberVerificationDto.Details.fromEntity(memberVerification)
     }
 }

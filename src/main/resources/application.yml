@@ -16,6 +16,9 @@ bserver:
     password:
       # 비밀번호 변경 인증 키 만료 시간 (분 단위)
       expiration: 5
+    email:
+      # 이메일 인증 키 만료 시간 (분 단위)
+      expiration: 1440
   # JWT 설정
   jwt:
     # 만료 시간 (모두 분 단위)
