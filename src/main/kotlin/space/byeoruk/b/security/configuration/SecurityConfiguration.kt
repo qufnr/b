@@ -52,7 +52,8 @@ class SecurityConfiguration(
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()               //  로그인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/refresh").permitAll()       //  로그인 토큰 리프레시
-                .requestMatchers(HttpMethod.GET, "/api/member-management/members").authenticated()          //  계정 조회
+                .requestMatchers(HttpMethod.GET, "/api/member-management/members").authenticated()          //  계정 조회 (본인)
+                .requestMatchers(HttpMethod.GET, "/api/member-management/members/**").permitAll()           //  계정 조회
                 .requestMatchers(HttpMethod.GET, "/api/member-management/members/can-use").permitAll()      //  계정 ID 또는 이메일 사용 가능 여부 확인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members/forget/id").permitAll()    //  계정 찾기
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members/forget/password").permitAll()  //  계정 비밀번호 찾기
