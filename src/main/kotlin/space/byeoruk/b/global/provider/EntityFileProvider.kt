@@ -17,7 +17,7 @@ interface EntityFileProvider<T> {
      * @throws FileUtilityException 유효성 검증 실패 시 던짐
      */
     fun validate(file: MultipartFile, extensions: String, size: Long) {
-        FileUtilities.validateExtension(file, extensions.split(","))
+        FileUtilities.validateExtension(file, extensions.lowercase().split(","))
         FileUtilities.validateSize(file, size)
     }
 }
