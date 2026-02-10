@@ -50,6 +50,8 @@ class MemberDto {
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
         @Size(max = 512)
         val bio: String,
+        @Schema(description = "생일", example = "1972-12-31")
+        val birthday: LocalDate?,
     )
 
     /**

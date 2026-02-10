@@ -113,6 +113,7 @@ class Member(
 
         name = request.name
         bio = request.bio
+        birthday = request.birthday
     }
 
     /**
