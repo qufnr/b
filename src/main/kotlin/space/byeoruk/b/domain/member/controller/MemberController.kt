@@ -59,7 +59,7 @@ class MemberController(private val memberService: MemberService) {
     @Operation(summary = "계정 리소스(아바타, 배너) 수정", description = "계정 아바타 또는 배너를 수정합니다.")
     @PutMapping("/resource")
     fun update(
-        @RequestBody request: MemberDto.UpdateResourceRequest,
+        @RequestPart request: MemberDto.UpdateResourceRequest,
         @RequestPart file: MultipartFile,
         @AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<Void> {
         memberService.update(request, file, memberDetails)
