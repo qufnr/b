@@ -50,11 +50,11 @@ bserver:
       # 사용자 아바타
       avatar:
         size: 100
-        extensions: 'jpeg,jpg,png,gif'
+        extensions: 'jpeg,jpg,png,gif,webp'
       # 사용자 배너
       banner:
         size: 100
-        extensions: 'jpeg,jpg,png'
+        extensions: 'jpeg,jpg,png,webp'
   # 개인 설정 - JWT 설정
   jwt:
     # 시크릿 키
