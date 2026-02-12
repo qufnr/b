@@ -13,7 +13,6 @@ import java.util.UUID
 @Component
 class ServerResourceProvider(
     @Value($$"${bserver.resource.windows}") val path: String,
-    //  TODO :: 리눅스, macOS 파일 패스도 로직에 추가하기
     @Value($$"${bserver.resource.linux}") val linuxPath: String,
     @Value($$"${bserver.resource.mac}") val macOsPath: String,
 ) {
