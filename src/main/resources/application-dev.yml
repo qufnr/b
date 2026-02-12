@@ -44,7 +44,9 @@ bserver:
   # 개인 설정 - 리소스(파일)
   resource:
     # 서버 리소스 저장 경로
-    path: 'C:/bserver-resources/'
+    windows: 'C:/bserver-resources/'
+    linux: 'var/www/html/bserver/resources/'
+    mac: '/Users/byeo/Documents/bserver-resources/'
     # 사용자 관련 리소스 설정
     member:
       # 사용자 아바타

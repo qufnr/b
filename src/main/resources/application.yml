@@ -10,6 +10,9 @@ server:
   port: 8172
 # 전역 개인 설정
 bserver:
+  # 리소스 외부 접근 URI
+  resource-uri: /static/resources/
+  # 계정 이름 변경 딜레이
   name-change-delay: 30
   # 인증 설정
   verification:
