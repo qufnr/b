@@ -26,7 +26,10 @@ class SecurityConfiguration(
     private val accessDeniedHandlerImpl: AccessDeniedHandlerImpl,
 
     @Value($$"${bserver.app-url}")
-    private val appUrl: String
+    private val appUrl: String,
+
+    @Value($$"${bserver.resource-uri}")
+    private val resourceUri: String
 ) {
     //  허용 해더 목록
     private final val allowedHeaders: Array<String> = arrayOf(
@@ -48,7 +51,7 @@ class SecurityConfiguration(
             .formLogin { configurer -> configurer.disable() }
             .cors { configurer -> configurer.configurationSource(corsConfigurationSource) }
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico").permitAll()
+            .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico", "$resourceUri**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()               //  로그인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/refresh").permitAll()       //  로그인 토큰 리프레시
