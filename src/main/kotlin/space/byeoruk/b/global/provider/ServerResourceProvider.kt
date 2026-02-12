@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
 import space.byeoruk.b.global.utility.FileUtilities
+import space.byeoruk.b.global.utility.SystemUtilities
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -11,7 +12,10 @@ import java.util.UUID
 
 @Component
 class ServerResourceProvider(
-    @Value($$"${bserver.resource.path}") val path: String
+    @Value($$"${bserver.resource.windows}") val path: String,
+    //  TODO :: 리눅스, macOS 파일 패스도 로직에 추가하기
+    @Value($$"${bserver.resource.linux}") val linuxPath: String,
+    @Value($$"${bserver.resource.mac}") val macOsPath: String,
 ) {
     /**
      * 멀티파트 파일을 서버 쪽으로 전송
@@ -31,11 +35,17 @@ class ServerResourceProvider(
      * @return 서버에 저장된 파일 명
      */
     fun transfer(file: MultipartFile, folder: String? = null): String {
+        val resourcePath = when(SystemUtilities.getOsName()) {
+            "windows" -> path
+            "macos" -> macOsPath
+            else -> linuxPath
+        }
+
         var mergedPath =
             if(folder != null && folder.isNotBlank())
-                path + (if(folder.startsWith("/")) folder.substring(1) else folder)
+                resourcePath + (if(folder.startsWith("/")) folder.substring(1) else folder)
             else
-                path
+                resourcePath
         mergedPath += if(mergedPath.endsWith("/")) "" else "/"
 
         val extension = FileUtilities.getExtension(file)
