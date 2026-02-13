@@ -6,6 +6,9 @@ spring:
   web:
     resources:
       add-mappings: false
+  messages:
+    basename: messages
+    encoding: UTF-8
 server:
   port: 8172
 # 전역 개인 설정

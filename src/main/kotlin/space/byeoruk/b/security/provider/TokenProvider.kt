@@ -68,46 +68,46 @@ open class TokenProvider(
      */
     fun getBearerToken(bearerToken: String): String {
         if(bearerToken.isBlank())
-            throw TokenValidationException("토큰이 누락되었습니다.")
+            throw TokenValidationException("error.token.missing")
 
         if(!bearerToken.startsWith(authorizationBearer))
-            throw TokenValidationException("토큰에 \"%s\"이(가) 누락되었습니다.".format(authorizationBearer))
+            throw TokenValidationException("error.token.missing.bearer", arrayOf(authorizationBearer))
 
         return bearerToken.substring(authorizationBearer.length).trim()
     }
 
     fun isValidToken(token: String? = null): Boolean {
         if(token == null)
-            throw TokenValidationException("토큰이 누락되었습니다.")
+            throw TokenValidationException("error.token.missing")
 
         try {
             val payload = getTokenPayload(token)
 
             if(issuer != payload.issuer)
-                throw TokenValidationException("발행자가 올바르지 않습니다.")
+                throw TokenValidationException("error.token.invalid.issuer")
 
             //  여기서 토큰 유형이 없으면 예외 터짐
             val tokenType = TokenType.valueOf(payload["type"] as String)
 
             if(tokenType == TokenType.ACCESS && (payload["authorities"] == null || payload["authorities"].toString().isBlank()))
-                throw TokenValidationException("계정 역할이 배분되지 않았습니다.")
+                throw TokenValidationException("error.token.invalid.authority")
 
             return !payload.expiration.before(Date())
         }
         catch(e: SecurityException) {
-            throw TokenValidationException("토큰 시그니처가 올바르지 않습니다.")
+            throw TokenValidationException("error.token.invalid.signature")
         }
         catch(e: MalformedJwtException) {
-            throw TokenValidationException("토큰이 유효하지 않습니다.")
+            throw TokenValidationException("error.token.invalid")
         }
         catch(e: ExpiredJwtException) {
-            throw TokenValidationException("토큰 유효 기간이 만료되었습니다.")
+            throw TokenValidationException("error.token.expired")
         }
         catch(e: UnsupportedJwtException) {
-            throw TokenValidationException("지원하지 않는 토큰입니다.")
+            throw TokenValidationException("error.token.unsupported")
         }
         catch(e: IllegalArgumentException) {
-            throw TokenValidationException("토큰의 Argument 혹은 Compact 가 올바르지 않습니다.")
+            throw TokenValidationException("error.token.invalid.args", arrayOf("Argument", "Compact"))
         }
         catch(e: Exception) {
             throw e

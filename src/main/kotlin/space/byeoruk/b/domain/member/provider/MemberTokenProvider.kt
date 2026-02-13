@@ -69,10 +69,10 @@ class MemberTokenProvider(
     fun getTokenPayload(authorization: String, type: TokenType): Claims {
         val token = tokenProvider.getBearerToken(authorization)
         if(!tokenProvider.isValidToken(token))
-            throw TokenValidationException("잘못된 토큰입니다.")
+            throw TokenValidationException("error.token.invalid")
 
         if(tokenProvider.getTokenType(token) != type)
-            throw TokenValidationException("토큰 유형이 올바르지 않습니다.")
+            throw TokenValidationException("error.token.invalid.type")
 
         return tokenProvider.getTokenPayload(token)
     }

@@ -1,6 +1,8 @@
 package space.byeoruk.b.domain.member.service
 
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.MessageSource
+import org.springframework.context.i18n.LocaleContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -33,6 +35,7 @@ import space.byeoruk.b.security.model.TokenType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 
 @Service
 class MemberService(
@@ -49,6 +52,7 @@ class MemberService(
     private val memberRepository: MemberRepository,
     private val memberVerificationRepository: MemberVerificationRepository,
 
+    private val messageSource: MessageSource,
     private val passwordEncoder: PasswordEncoder,
     private val mailSender: MailSender,
 
@@ -191,9 +195,13 @@ class MemberService(
 
         val memberDetails = MemberDto.Details.fromEntity(member)
 
+        val locale: Locale = LocaleContextHolder.getLocale()
+        val subject = messageSource.getMessage("mail.member.forget.id.subject", null, "mail.member.forget.id.subject", locale)
+        val message = messageSource.getMessage("mail.member.forget.id.message", arrayOf(memberDetails.getMaskedId(), memberDetails.getMaskedEmail()), "mail.member.forget.id.message", locale)
+
         mailSender.send(member.email, MailDto.Content(
-            subject = "기억에서 잠깐 사라졌던 계정을 찾았어요!",
-            message = "${memberDetails.getMaskedId()}(으)로 계정을 만들었고, ${memberDetails.getMaskedEmail()} 이메일을 사용하고 있어요."
+            subject = subject!!,
+            message = message!!
         ))
 
         return memberDetails
@@ -220,9 +228,13 @@ class MemberService(
 
         member.addVerification(MemberVerifyType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
 
+        val locale: Locale = LocaleContextHolder.getLocale()
+        val subject = messageSource.getMessage("mail.member.forget.password.subject", null, "mail.member.forget.password.subject", locale)
+        val message = messageSource.getMessage("mail.member.forget.password.message", null, "mail.member.forget.password.message", locale)
+
         mailSender.send(member.email, MailDto.Content(
-            subject = "계정 비밀번호를 잊어버리셨나요?",
-            message = "아래 인증 키를 인증 단계 화면에서 입력해 주세요.",
+            subject = subject!!,
+            message = message!!,
             code = key,
             actionUrl =  "" //  TODO :: 프론트로 바로 이동할 수 있는 URL 을 제공할지 생각 해보기
         ))

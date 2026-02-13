@@ -2,6 +2,7 @@ package space.byeoruk.b.global.exception
 
 import java.lang.RuntimeException
 
-open class CustomException: RuntimeException {
-    constructor(message: String): super(message)
-}
+open class CustomException(
+    val key: String,
+    val args: Array<out Any>? = null
+): RuntimeException(key)

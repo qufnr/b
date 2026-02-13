@@ -19,24 +19,24 @@ class MemberDto {
      */
     class CreateRequest(
         @Schema(description = "계정 ID", example = "username1234")
-        @NotBlank
-        @Size(max = 32)
+        @NotBlank(message = "{validation.member.id.mandatory}")
+        @Size(max = 32, message = "{validation.member.id.size}")
         val id: String,
         @Schema(description = "계정 비밀번호", example = "1q2w3e4r!")
-        @NotBlank
-        @Size(max = 64)
+        @NotBlank(message = "{validation.member.password.mandatory")
+        @Size(max = 64, message = "{validation.member.password.size}")
         val password: String,
         @Schema(description = "계정 비밀번호 확인", example = "1q2w3e4r!")
-        @NotBlank
+        @NotBlank(message = "{validation.member.password-confirm.mandatory}")
         val passwordConfirm: String,
         @Schema(description = "이메일", example = "member@byeoruk.space")
-        @Email
+        @Email(message = "{validation.member.email.format}")
         val email: String,
         @Schema(description = "계정 이름", example = "김수한무")
-        @Size(max = 16)
+        @Size(max = 16, message = "{validation.member.name.size}")
         val name: String?,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
-        @Size(max = 512)
+        @Size(max = 512, message = "{validation.member.bio.size}")
         val bio: String,
     )
 
@@ -45,10 +45,10 @@ class MemberDto {
      */
     class UpdateRequest(
         @Schema(description = "계정 이름", example = "아리텐동")
-        @Size(max = 16)
+        @Size(max = 16, message = "{validation.member.name.size}")
         val name: String,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
-        @Size(max = 512)
+        @Size(max = 512, message = "{validation.member.bio.size}")
         val bio: String,
         @Schema(description = "생일", example = "1972-12-31")
         val birthday: LocalDate?,
