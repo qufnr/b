@@ -27,6 +27,8 @@ class SecurityConfiguration(
 
     @Value($$"${bserver.app-url}")
     private val appUrl: String,
+    @Value($$"${bserver.app-url-local}")
+    private val appUrlLocal: String,
 
     @Value($$"${bserver.resource-uri}")
     private val resourceUri: String
@@ -35,6 +37,7 @@ class SecurityConfiguration(
     private final val allowedHeaders: Array<String> = arrayOf(
         "Authorization",
         "Content-Type",
+        "Accept-Language",
         "X-BServer-Sign-Authorization",
         "X-BServer-Refresh-Authorization",
     )
@@ -84,6 +87,7 @@ class SecurityConfiguration(
         val configuration = CorsConfiguration()
 
         configuration.addAllowedOrigin(appUrl)
+        configuration.addAllowedOrigin(appUrlLocal)
         configuration.allowCredentials = true
         allowedHeaders.forEach { header -> configuration.addAllowedHeader(header) }
         allowedMethods.forEach { method -> configuration.addAllowedMethod(method) }

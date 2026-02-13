@@ -41,6 +41,7 @@ spring:
 bserver:
   # 앱 URL
   app-url: http://localhost:5000
+  app-url-local: http://192.168.100.28:5000
   # 개인 설정 - 리소스(파일)
   resource:
     # 서버 리소스 저장 경로
