@@ -4,11 +4,15 @@ plugins {
     id("org.springframework.boot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.2.21"
+
+    id("com.google.devtools.ksp") version "2.2.21-2.0.5"
 }
 
 group = "space.byeoruk"
 version = "0.0.1-SNAPSHOT"
 description = "Project B"
+
+val queryDslVersion = "7.0"
 
 java {
     toolchain {
@@ -50,6 +54,11 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+    //  QueryDSL
+    implementation("io.github.openfeign.querydsl:querydsl-core:$queryDslVersion")
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
+    ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:$queryDslVersion")
+
     //  Kotlin 로깅
     implementation("io.github.oshai:kotlin-logging-jvm:5.1.0")
 
@@ -71,6 +80,10 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
+
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
     }
 }
 
