@@ -1,0 +1,4 @@
+### 팔로우
+POST {{url}}member-management/follows/toggle/1
+Content-Type: application/json
+Authorization: Bearer {{bearer.access}}

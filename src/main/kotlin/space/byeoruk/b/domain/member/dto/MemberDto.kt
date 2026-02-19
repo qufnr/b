@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberCanUseType
+import space.byeoruk.b.domain.member.model.MemberFollowState
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.global.utility.StringUtilities.mask
@@ -105,9 +106,15 @@ class MemberDto {
     /**
      * 이메일 인증 요청
      */
-    class VerifyEmailRequest (
+    class VerifyEmailRequest(
         @Schema(description = "인증 키", example = "F127FBV")
         val key: String,
+    )
+
+    class FollowResponse(
+        @Schema(description = "팔로우 여부", example = "UNFOLLOW / FOLLOW")
+        val state: MemberFollowState,
+        val followee: Details
     )
 
     /**
@@ -119,11 +126,11 @@ class MemberDto {
         @Schema(description = "계정 ID", example = "username1234")
         val id: String,
         @Schema(description = "계정 이메일", example = "aris@kivotos.jp")
-        val email: String,
+        val email: String = "",
         @Schema(description = "계정 이름", example = "아리텐스동동스")
-        val name: String?,
+        val name: String? = null,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
-        val bio: String?,
+        val bio: String? = "<p></p>",
         @Schema(description = "색상", example = "#FFFF00")
         val colour: String,
         @Schema(description = "아바타 이미지 파일", example = "filename.jpg")
@@ -131,9 +138,9 @@ class MemberDto {
         @Schema(description = "배너 이미지 파일", example = "filename.jpg")
         val banner: String? = "",
         @Schema(description = "마지막 로그인 날짜")
-        val lastSignedAt: LocalDateTime,
+        val lastSignedAt: LocalDateTime? = null,
         @Schema(description = "마지막 계정 이름 변경 날짜")
-        val lastNameChangedDate: LocalDate?,
+        val lastNameChangedDate: LocalDate? = null,
         @Schema(description = "탄생일", example = "2025-03-30")
         val birthday: LocalDate? = null,
         @Schema(description = "계정 잠금 여부", example = "false")
@@ -142,6 +149,14 @@ class MemberDto {
         val isEnabled: Boolean,
         @Schema(description = "계정 인증 여부", example = "true")
         val isVerified: Boolean,
+        @Schema(description = "나를 팔로우하는지 여부", example = "false")
+        val isFollower: Boolean,
+        @Schema(description = "내가 팔로우하는지 여부", example = "true")
+        val isFollowing: Boolean,
+        @Schema(description = "팔로워 수", example = "1145")
+        val followers: Int = 0,
+        @Schema(description = "팔로잉 수", example = "141919")
+        val followings: Int = 0,
 
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
@@ -169,22 +184,24 @@ class MemberDto {
              */
             fun fromEntity(member: Member): Details {
                 return Details(
-                    member.uid,
-                    member.id,
-                    member.email,
-                    member.name,
-                    member.bio,
-                    member.colour,
-                    member.avatar,
-                    member.banner,
-                    member.lastSignedAt,
-                    member.lastNameChangedDate,
-                    member.birthday,
-                    member.isLocked,
-                    member.isEnabled,
-                    member.isVerified,
-                    MemberPrivacyDto.Details.fromEntity(member.privacy),
-                    member.authorities.map { authority -> authority.authority }.toList()
+                    uid = member.uid,
+                    id = member.id,
+                    email = member.email,
+                    name = member.name,
+                    bio = member.bio,
+                    colour = member.colour,
+                    avatar = member.avatar,
+                    banner = member.banner,
+                    lastSignedAt = member.lastSignedAt,
+                    lastNameChangedDate = member.lastNameChangedDate,
+                    birthday = member.birthday,
+                    isLocked = member.isLocked,
+                    isEnabled = member.isEnabled,
+                    isVerified = member.isVerified,
+                    isFollower = false,
+                    isFollowing = false,
+                    privacy = MemberPrivacyDto.Details.fromEntity(member.privacy),
+                    authorities = member.authorities.map { authority -> authority.authority }.toList()
                 )
             }
 

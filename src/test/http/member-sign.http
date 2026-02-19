@@ -4,7 +4,7 @@ POST {{url}}member-management/signs/id
 Content-Type: application/json
 
 {
-    "value": "aris1"
+    "value": "byeo-chan"
 }
 
 ### 로그인
@@ -14,5 +14,5 @@ Content-Type: application/json
 X-BServer-Sign-Authorization: Bearer {{bearer.sign}}
 
 {
-    "password": "12345"
+    "password": "1234"
 }

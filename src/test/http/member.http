@@ -4,12 +4,12 @@ POST {{url}}member-management/members
 Content-Type: application/json
 
 {
-    "id": "aris1",
+    "id": "byeo-chan",
     "password": "1234",
     "passwordConfirm": "1234",
     "email": "qufnr@kakao.com",
-    "name": "아리텐동",
-    "bio": "<p></p>"
+    "name": "룩벼쟝",
+    "bio": "<p>저에요</p>"
 }
 
 ### 계정 수정
