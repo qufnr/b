@@ -26,6 +26,7 @@ import space.byeoruk.b.domain.member.model.MemberVerifyType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
 import space.byeoruk.b.domain.member.provider.MemberTokenProvider
+import space.byeoruk.b.domain.member.repository.MemberFollowRepository
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.domain.member.repository.MemberVerificationRepository
 import space.byeoruk.b.global.utility.StringUtilities
@@ -50,6 +51,7 @@ class MemberService(
     private val nameChangeDelay: Long,
 
     private val memberRepository: MemberRepository,
+    private val memberFollowRepository: MemberFollowRepository,
     private val memberVerificationRepository: MemberVerificationRepository,
 
     private val messageSource: MessageSource,
@@ -77,13 +79,24 @@ class MemberService(
      * 계정 UID 로 정보 조회
      *
      * @param uid 계정 UID
+     * @param memberDetails 사용자 인증 객체
      * @return 계정 상세 정보
      */
-    fun read(uid: Long): MemberDto.Details {
-        val member = memberRepository.findById(uid)
+    fun read(uid: Long, memberDetails: MemberDetails): MemberDto.Details {
+        val opponent = memberRepository.findById(uid)
             .orElseThrow { MemberNotFoundException() }
 
-        return MemberDto.Details.fromEntity(member)
+        var details = MemberDto.Details.fromEntity(opponent)
+
+        val member = memberRepository.findById(memberDetails.username)
+            .orElse(null)
+
+        if(member != null) {
+            details.isFollowingMe = memberFollowRepository.existsByFollowerAndFollowee(opponent, member)
+            details.amIFollowing = memberFollowRepository.existsByFollowerAndFollowee(member, opponent)
+        }
+
+        return details
     }
 
     /**

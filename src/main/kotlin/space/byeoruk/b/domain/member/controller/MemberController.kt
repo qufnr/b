@@ -36,8 +36,9 @@ class MemberController(private val memberService: MemberService) {
     @GetMapping("/{uid}")
     fun read(
         @Parameter(description = "계정 UID", example = "1")
-        @PathVariable uid: Long): ResponseEntity<*> {
-        return ResponseEntity.ok().body(ResponseDto.build(memberService.read(uid), HttpStatus.OK))
+        @PathVariable uid: Long,
+        @AuthenticationPrincipal memberDetails: MemberDetails): ResponseEntity<*> {
+        return ResponseEntity.ok().body(ResponseDto.build(memberService.read(uid, memberDetails), HttpStatus.OK))
     }
 
     @Operation(summary = "계정 생성", description = "계정을 생성합니다.")

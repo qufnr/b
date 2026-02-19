@@ -150,13 +150,13 @@ class MemberDto {
         @Schema(description = "계정 인증 여부", example = "true")
         val isVerified: Boolean,
         @Schema(description = "나를 팔로우하는지 여부", example = "false")
-        val isFollower: Boolean,
+        var isFollowingMe: Boolean,
         @Schema(description = "내가 팔로우하는지 여부", example = "true")
-        val isFollowing: Boolean,
+        var amIFollowing: Boolean,
         @Schema(description = "팔로워 수", example = "1145")
-        val followers: Int = 0,
+        var followers: Int = 0,
         @Schema(description = "팔로잉 수", example = "141919")
-        val followings: Int = 0,
+        var followings: Int = 0,
 
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
@@ -198,8 +198,8 @@ class MemberDto {
                     isLocked = member.isLocked,
                     isEnabled = member.isEnabled,
                     isVerified = member.isVerified,
-                    isFollower = false,
-                    isFollowing = false,
+                    isFollowingMe = false,
+                    amIFollowing = false,
                     privacy = MemberPrivacyDto.Details.fromEntity(member.privacy),
                     authorities = member.authorities.map { authority -> authority.authority }.toList()
                 )
