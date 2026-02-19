@@ -70,7 +70,7 @@ class Member(
     @Column(name = "is_enabled", comment = "계정 활성화 여부")
     var isEnabled: Boolean = true,
 
-    @Column(name = "is_verified")
+    @Column(name = "is_verified", comment = "계정 인증 여부")
     var isVerified: Boolean = false,
 
     @OneToOne(cascade = [CascadeType.ALL], orphanRemoval = true)

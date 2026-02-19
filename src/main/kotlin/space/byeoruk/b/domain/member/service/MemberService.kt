@@ -293,7 +293,7 @@ class MemberService(
     }
 
     @Transactional
-    @MemberAction(MemberHistoryType.ACCOUNT_EMAIL_VERIFY)
+    @MemberAction(MemberHistoryType.ACCOUNT_EMAIL_VERIFIED)
     fun verifyEmail(request: MemberDto.VerifyEmailRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
