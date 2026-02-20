@@ -8,7 +8,6 @@ import space.byeoruk.b.domain.member.entity.MemberVerification
 import space.byeoruk.b.domain.member.model.MemberVerifyType
 import java.time.LocalDateTime
 
-@Repository
 interface MemberVerificationRepository: JpaRepository<MemberVerification, Long> {
     @Query("""
             SELECT mv FROM MemberVerification mv

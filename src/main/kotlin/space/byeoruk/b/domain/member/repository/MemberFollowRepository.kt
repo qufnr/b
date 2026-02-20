@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.entity.MemberFollow
 
-@Repository
 interface MemberFollowRepository: JpaRepository<MemberFollow, Long> {
     /**
      * 특정 사용자가 다른 사용자를 팔로우 중인지 여부 확인

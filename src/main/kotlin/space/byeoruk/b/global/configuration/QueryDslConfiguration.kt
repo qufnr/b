@@ -2,13 +2,15 @@ package space.byeoruk.b.global.configuration
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class QueryDslConfiguration(
-    private val entityManager: EntityManager
-) {
+class QueryDslConfiguration {
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
+
     @Bean
     fun jpaQueryFactory() = JPAQueryFactory(entityManager)
 }

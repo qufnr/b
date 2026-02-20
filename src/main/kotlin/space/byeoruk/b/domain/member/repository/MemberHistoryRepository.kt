@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import space.byeoruk.b.domain.member.entity.MemberHistory
 
-@Repository
 interface MemberHistoryRepository: JpaRepository<MemberHistory, Long> {
 
 }

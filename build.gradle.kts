@@ -74,7 +74,7 @@ dependencies {
     implementation("com.google.http-client:google-http-client-jackson2:1.39.2")         //  HTTP Client with Jackson
 
     //  Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
 }
 
 kotlin {

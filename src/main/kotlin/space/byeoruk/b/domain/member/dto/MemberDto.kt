@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberCanUseType
 import space.byeoruk.b.domain.member.model.MemberFollowState
+import space.byeoruk.b.domain.member.model.MemberPrivacyType
 import space.byeoruk.b.domain.member.model.MemberResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.global.utility.StringUtilities.mask
@@ -111,12 +112,6 @@ class MemberDto {
         val key: String,
     )
 
-    class FollowResponse(
-        @Schema(description = "팔로우 여부", example = "UNFOLLOW / FOLLOW")
-        val state: MemberFollowState,
-        val followee: Details
-    )
-
     /**
      * 기본 계정 조회
      */
@@ -126,11 +121,11 @@ class MemberDto {
         @Schema(description = "계정 ID", example = "username1234")
         val id: String,
         @Schema(description = "계정 이메일", example = "aris@kivotos.jp")
-        val email: String = "",
+        var email: String = "",
         @Schema(description = "계정 이름", example = "아리텐스동동스")
         val name: String? = null,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
-        val bio: String? = "<p></p>",
+        var bio: String? = "<p></p>",
         @Schema(description = "색상", example = "#FFFF00")
         val colour: String,
         @Schema(description = "아바타 이미지 파일", example = "filename.jpg")
@@ -142,22 +137,15 @@ class MemberDto {
         @Schema(description = "마지막 계정 이름 변경 날짜")
         val lastNameChangedDate: LocalDate? = null,
         @Schema(description = "탄생일", example = "2025-03-30")
-        val birthday: LocalDate? = null,
+        var birthday: LocalDate? = null,
         @Schema(description = "계정 잠금 여부", example = "false")
         val isLocked: Boolean,
         @Schema(description = "계정 활성화 여부", example = "true")
         val isEnabled: Boolean,
         @Schema(description = "계정 인증 여부", example = "true")
         val isVerified: Boolean,
-        @Schema(description = "나를 팔로우하는지 여부", example = "false")
-        var isFollowingMe: Boolean,
-        @Schema(description = "내가 팔로우하는지 여부", example = "true")
-        var amIFollowing: Boolean,
-        @Schema(description = "팔로워 수", example = "1145")
-        var followers: Int = 0,
-        @Schema(description = "팔로잉 수", example = "141919")
-        var followings: Int = 0,
 
+        val followStatus: MemberFollowDto.Status,
         val privacy: MemberPrivacyDto.Details,
         val authorities: List<MemberRole>
     ) {
@@ -174,6 +162,20 @@ class MemberDto {
          * @return 마스킹된 계정 이메일
          */
         fun getMaskedEmail(): String = email.maskEmail()
+
+        /**
+         * 프라이버시 설정에 반영하여 데이터 숨김 처리
+         */
+        fun privacyField() {
+            if(privacy.profile == MemberPrivacyType.PRIVATE || (privacy.profile == MemberPrivacyType.FOLLOW_ONLY && !followStatus.amIFollowing)) {
+                bio = "<p></p>"
+                email = ""
+                birthday = null
+            }
+
+            else if(privacy.birthday == MemberPrivacyType.PRIVATE || (privacy.birthday == MemberPrivacyType.FOLLOW_ONLY && !followStatus.amIFollowing))
+                birthday = null
+        }
 
         companion object {
             /**
@@ -198,8 +200,7 @@ class MemberDto {
                     isLocked = member.isLocked,
                     isEnabled = member.isEnabled,
                     isVerified = member.isVerified,
-                    isFollowingMe = false,
-                    amIFollowing = false,
+                    followStatus = MemberFollowDto.Status(),
                     privacy = MemberPrivacyDto.Details.fromEntity(member.privacy),
                     authorities = member.authorities.map { authority -> authority.authority }.toList()
                 )
@@ -219,8 +220,9 @@ class MemberDto {
                 "member.avatar" to member.avatar,
                 "member.banner" to member.banner,
                 "member.birthday" to member.birthday,
-                "member.privacy.isPublic" to member.privacy.isPublic,
-                "member.privacy.isBirthdayPublic" to member.privacy.isBirthdayPublic,
+                "member.privacy.profile" to member.privacy.profile,
+                "member.privacy.birthday" to member.privacy.birthday,
+                "member.privacy.feed" to member.privacy.feed,
             )
         }
     }

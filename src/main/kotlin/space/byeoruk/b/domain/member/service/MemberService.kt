@@ -51,7 +51,6 @@ class MemberService(
     private val nameChangeDelay: Long,
 
     private val memberRepository: MemberRepository,
-    private val memberFollowRepository: MemberFollowRepository,
     private val memberVerificationRepository: MemberVerificationRepository,
 
     private val messageSource: MessageSource,
@@ -83,20 +82,13 @@ class MemberService(
      * @return 계정 상세 정보
      */
     fun read(uid: Long, memberDetails: MemberDetails): MemberDto.Details {
-        val opponent = memberRepository.findById(uid)
-            .orElseThrow { MemberNotFoundException() }
-
-        var details = MemberDto.Details.fromEntity(opponent)
-
         val member = memberRepository.findById(memberDetails.username)
             .orElse(null)
 
-        if(member != null) {
-            details.isFollowingMe = memberFollowRepository.existsByFollowerAndFollowee(opponent, member)
-            details.amIFollowing = memberFollowRepository.existsByFollowerAndFollowee(member, opponent)
-        }
-
-        return details
+        return if(member == null)
+            memberRepository.findByUid(uid)
+        else
+            memberRepository.findByUid(uid, member)
     }
 
     /**

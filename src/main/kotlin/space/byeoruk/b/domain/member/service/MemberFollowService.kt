@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import space.byeoruk.b.domain.member.details.MemberDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
+import space.byeoruk.b.domain.member.dto.MemberFollowDto
 import space.byeoruk.b.domain.member.entity.MemberFollow
 import space.byeoruk.b.domain.member.exception.MemberFolloweeMyselfException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
@@ -24,7 +25,7 @@ class MemberFollowService(
      * @return 팔로우 상태
      */
     @Transactional
-    fun toggle(followeeMemberUid: Long, memberDetails: MemberDetails): MemberDto.FollowResponse {
+    fun toggle(followeeMemberUid: Long, memberDetails: MemberDetails): MemberFollowDto.Response {
         var followState: MemberFollowState
 
         val member = memberRepository.findById(memberDetails.username)
@@ -51,6 +52,6 @@ class MemberFollowService(
             followState = MemberFollowState.FOLLOW
         }
 
-        return MemberDto.FollowResponse(followState, MemberDto.Details.fromEntity(followee))
+        return MemberFollowDto.Response(followState, MemberDto.Details.fromEntity(followee))
     }
 }

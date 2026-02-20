@@ -51,3 +51,8 @@ X-BServer-Password-Authorization: Bearer {{bearer.password}}
     "password": "12345",
     "passwordConfirm": "12345"
 }
+
+### 계정 조회
+GET {{url}}member-management/members/1
+Content-Type: application/json
+Authorization: Bearer {{bearer.access}}
