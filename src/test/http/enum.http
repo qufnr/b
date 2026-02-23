@@ -1,0 +1,3 @@
+### Enum 조회
+GET {{url}}enum-management/enums
+Content-Type: application/json
