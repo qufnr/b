@@ -12,7 +12,7 @@ import space.byeoruk.b.domain.common.service.EnumService
 import space.byeoruk.b.global.dto.ResponseDto
 
 @Tag(name = "Enumeration", description = "서버에 정의된 Enum 관리")
-@RequestMapping("/api/enum-management/enums")
+@RequestMapping("/api/common-management/enums")
 @RestController
 class EnumController(private val enumService: EnumService) {
 

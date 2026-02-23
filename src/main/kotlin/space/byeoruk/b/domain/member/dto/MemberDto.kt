@@ -53,6 +53,7 @@ class MemberDto {
         val bio: String,
         @Schema(description = "생일", example = "1972-12-31")
         val birthday: LocalDate?,
+        val privacy: MemberPrivacyDto.UpdateRequest?,
     )
 
     /**

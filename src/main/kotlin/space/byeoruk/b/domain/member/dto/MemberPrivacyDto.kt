@@ -5,6 +5,21 @@ import space.byeoruk.b.domain.member.entity.MemberPrivacy
 import space.byeoruk.b.domain.member.model.PrivacyStatus
 
 class MemberPrivacyDto {
+    /**
+     * 프라이버시 수정 요청
+     */
+    class UpdateRequest(
+        @Schema(description = "프로필 공개 여부", example = "PUBLIC")
+        val profile: PrivacyStatus,
+        @Schema(description = "탄생일 공개 여부", example = "PRIVATE")
+        val birthday: PrivacyStatus,
+        @Schema(description = "피드 공개 여부", example = "FOLLOW_ONLY")
+        val feed: PrivacyStatus
+    )
+
+    /**
+     * 프라이버시 디테일
+     */
     class Details(
         @Schema(description = "프로필 공개 여부", example = "PUBLIC")
         val profile: PrivacyStatus,

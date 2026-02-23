@@ -114,6 +114,12 @@ class Member(
         name = request.name
         bio = request.bio
         birthday = request.birthday
+
+        if(request.privacy != null) {
+            privacy.profile = request.privacy.profile
+            privacy.birthday = request.privacy.birthday
+            privacy.feed = request.privacy.feed
+        }
     }
 
     /**

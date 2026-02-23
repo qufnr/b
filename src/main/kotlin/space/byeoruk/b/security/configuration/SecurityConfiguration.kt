@@ -55,8 +55,8 @@ class SecurityConfiguration(
             .cors { configurer -> configurer.configurationSource(corsConfigurationSource) }
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico", "$resourceUri**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/enum-management/enums/*").permitAll()    //  열거형 변수 단건 조회
-                .requestMatchers(HttpMethod.GET, "/api/enum-management/enums").permitAll()      //  열거형 변수 전체 조회
+                .requestMatchers(HttpMethod.GET, "/api/common-management/enums/*").permitAll()      //  열거형 변수 단건 조회
+                .requestMatchers(HttpMethod.GET, "/api/common-management/enums").permitAll()        //  열거형 변수 전체 조회
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()               //  로그인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/refresh").permitAll()       //  로그인 토큰 리프레시
