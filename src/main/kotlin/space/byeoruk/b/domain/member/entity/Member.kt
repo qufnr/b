@@ -15,7 +15,7 @@ import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.MemberVerificationDto
 import space.byeoruk.b.domain.member.exception.VerificationKeyAlreadyIssuedException
 import space.byeoruk.b.domain.member.model.MemberRole
-import space.byeoruk.b.domain.member.model.MemberVerifyType
+import space.byeoruk.b.domain.member.model.VerificationType
 import space.byeoruk.b.global.entity.BaseEntity
 import space.byeoruk.b.global.utility.ColourUtilities
 import java.time.LocalDate
@@ -162,7 +162,7 @@ class Member(
      * @param expiration 만료 시간 (분 단위)
      * @return 추가된 인증 정보 디테일
      */
-    fun addVerification(type: MemberVerifyType, key: String, expiration: Long): MemberVerificationDto.Details {
+    fun addVerification(type: VerificationType, key: String, expiration: Long): MemberVerificationDto.Details {
         //  같은 유형 중복 발급 제어
         if(verifications.any { it.type == type && it.expiredAt > LocalDateTime.now() })
             throw VerificationKeyAlreadyIssuedException()

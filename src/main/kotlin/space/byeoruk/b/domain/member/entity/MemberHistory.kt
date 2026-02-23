@@ -13,7 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import space.byeoruk.b.domain.member.dto.MemberHistoryDto
-import space.byeoruk.b.domain.member.model.MemberHistoryType
+import space.byeoruk.b.domain.member.model.HistoryLevel
 import space.byeoruk.b.global.entity.BaseEntity
 
 @Table(name = "member_history", comment = "계정 행동 기록")
@@ -26,7 +26,7 @@ class MemberHistory(
 
     @Column(name = "type", length = 32, nullable = false, comment = "기록 유형")
     @Enumerated(EnumType.STRING)
-    var type: MemberHistoryType,
+    var type: HistoryLevel,
 
     @Column(name = "before_value", length = 4096, comment = "이전 값")
     var before: String? = null,
@@ -47,7 +47,7 @@ class MemberHistory(
     @JoinColumn(name = "member_uid", nullable = false, comment = "계정 UID", foreignKey = ForeignKey(name = "FK_member_history_TO_member"))
     var member: Member,
 
-): BaseEntity() {
+    ): BaseEntity() {
 
     constructor(member: Member, before: String, after: String, record: MemberHistoryDto.RecordMap): this(
         type = record.type,

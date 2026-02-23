@@ -5,10 +5,9 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import space.byeoruk.b.domain.member.entity.Member
-import space.byeoruk.b.domain.member.model.MemberCanUseType
-import space.byeoruk.b.domain.member.model.MemberFollowState
-import space.byeoruk.b.domain.member.model.MemberPrivacyType
-import space.byeoruk.b.domain.member.model.MemberResourceType
+import space.byeoruk.b.domain.member.model.IdentityCanUse
+import space.byeoruk.b.domain.member.model.PrivacyStatus
+import space.byeoruk.b.domain.member.model.ResourceType
 import space.byeoruk.b.domain.member.model.MemberRole
 import space.byeoruk.b.global.utility.StringUtilities.mask
 import space.byeoruk.b.global.utility.StringUtilities.maskEmail
@@ -61,7 +60,7 @@ class MemberDto {
      */
     class UpdateResourceRequest(
         @Schema(description = "리소스 유형 (AVATAR | BANNER)", example = "AVATAR")
-        val type: MemberResourceType,
+        val type: ResourceType,
         @Schema(description = "삭제 여부", example = "false")
         val isDelete: Boolean,
     )
@@ -83,7 +82,7 @@ class MemberDto {
      */
     class CanUseRequest(
         @Schema(description = "유형 (ID | EMAIL)", example = "EMAIL")
-        val type: MemberCanUseType,
+        val type: IdentityCanUse,
         @Schema(description = "확인 값", example = "aris@kivotos.jp")
         val value: String
     )
@@ -167,13 +166,13 @@ class MemberDto {
          * 프라이버시 설정에 반영하여 데이터 숨김 처리
          */
         fun privacyField() {
-            if(privacy.profile == MemberPrivacyType.PRIVATE || (privacy.profile == MemberPrivacyType.FOLLOW_ONLY && !followStatus.amIFollowing)) {
+            if(privacy.profile == PrivacyStatus.PRIVATE || (privacy.profile == PrivacyStatus.FOLLOW_ONLY && !followStatus.amIFollowing)) {
                 bio = "<p></p>"
                 email = ""
                 birthday = null
             }
 
-            else if(privacy.birthday == MemberPrivacyType.PRIVATE || (privacy.birthday == MemberPrivacyType.FOLLOW_ONLY && !followStatus.amIFollowing))
+            else if(privacy.birthday == PrivacyStatus.PRIVATE || (privacy.birthday == PrivacyStatus.FOLLOW_ONLY && !followStatus.amIFollowing))
                 birthday = null
         }
 

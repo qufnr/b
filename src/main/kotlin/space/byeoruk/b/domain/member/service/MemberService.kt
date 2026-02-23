@@ -19,14 +19,13 @@ import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.NameChangeCooldownException
 import space.byeoruk.b.domain.member.exception.PasswordConfirmMismatchException
 import space.byeoruk.b.domain.member.exception.VerificationKeyEncryptFailedException
-import space.byeoruk.b.domain.member.model.MemberCanUseType
-import space.byeoruk.b.domain.member.model.MemberHistoryType
-import space.byeoruk.b.domain.member.model.MemberResourceType
-import space.byeoruk.b.domain.member.model.MemberVerifyType
+import space.byeoruk.b.domain.member.model.IdentityCanUse
+import space.byeoruk.b.domain.member.model.HistoryLevel
+import space.byeoruk.b.domain.member.model.ResourceType
+import space.byeoruk.b.domain.member.model.VerificationType
 import space.byeoruk.b.domain.member.provider.MemberAvatarProvider
 import space.byeoruk.b.domain.member.provider.MemberBannerProvider
 import space.byeoruk.b.domain.member.provider.MemberTokenProvider
-import space.byeoruk.b.domain.member.repository.MemberFollowRepository
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.domain.member.repository.MemberVerificationRepository
 import space.byeoruk.b.global.utility.StringUtilities
@@ -115,7 +114,7 @@ class MemberService(
      * @param memberDetails 계정 디테일
      */
     @Transactional
-    @MemberAction(type = MemberHistoryType.ACCOUNT_UPDATED, trackUpdates = true)
+    @MemberAction(type = HistoryLevel.ACCOUNT_UPDATED, trackUpdates = true)
     fun update(request: MemberDto.UpdateRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
@@ -150,7 +149,7 @@ class MemberService(
             .orElseThrow { MemberNotFoundException() }
 
         when(request.type) {
-            MemberResourceType.AVATAR -> {
+            ResourceType.AVATAR -> {
                 if(request.isDelete) {
                     memberAvatarProvider.delete(member)
                     member.updateAvatar()
@@ -158,7 +157,7 @@ class MemberService(
                 else
                     member.updateAvatar(memberAvatarProvider.save(member, file))
             }
-            MemberResourceType.BANNER -> {
+            ResourceType.BANNER -> {
                 if(request.isDelete) {
                     memberBannerProvider.delete(member)
                     member.updateBanner()
@@ -179,8 +178,8 @@ class MemberService(
      */
     fun canUse(request: MemberDto.CanUseRequest): MemberDto.CanUseResponse {
         val member = when(request.type) {
-            MemberCanUseType.ID -> memberRepository.findById(request.value)
-            MemberCanUseType.EMAIL -> memberRepository.findByEmail(request.value)
+            IdentityCanUse.ID -> memberRepository.findById(request.value)
+            IdentityCanUse.EMAIL -> memberRepository.findByEmail(request.value)
         }.orElse(null)
 
         return MemberDto.CanUseResponse(member == null)
@@ -193,7 +192,7 @@ class MemberService(
      * @return 계정 정보
      */
     @Transactional
-    @MemberAction(MemberHistoryType.ACCOUNT_FORGET)
+    @MemberAction(HistoryLevel.ACCOUNT_FORGET)
     fun forget(request: MemberDto.ForgetRequest): MemberDto.Details {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
@@ -221,7 +220,7 @@ class MemberService(
      * @return 사용자 ID 상세 정보 (사용자 ID 검증과 같은 응답 보냄)
      */
     @Transactional
-    @MemberAction(MemberHistoryType.ACCOUNT_FORGET_PASSWORD)
+    @MemberAction(HistoryLevel.ACCOUNT_FORGET_PASSWORD)
     fun forgetPassword(request: MemberDto.ForgetRequest): SignDto.IdDetails {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow { MemberNotFoundException() }
@@ -231,7 +230,7 @@ class MemberService(
             passwordEncoder.encode(key)
                 ?: throw VerificationKeyEncryptFailedException()
 
-        member.addVerification(MemberVerifyType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
+        member.addVerification(VerificationType.RESET_PASSWORD, encryptedKey, resetPasswordKeyExpiration)
 
         val locale: Locale = LocaleContextHolder.getLocale()
         val subject = messageSource.getMessage("mail.member.forget.password.subject", null, "mail.member.forget.password.subject", locale)
@@ -255,7 +254,7 @@ class MemberService(
      * @return 사용자 상세 정보
      */
     @Transactional
-    @MemberAction(MemberHistoryType.ACCOUNT_PASSWORD_UPDATED)
+    @MemberAction(HistoryLevel.ACCOUNT_PASSWORD_UPDATED)
     fun updatePassword(request: MemberDto.UpdatePasswordRequest, authorization: String): MemberDto.Details {
         val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.PASSWORD)
 
@@ -266,7 +265,7 @@ class MemberService(
         val member = memberRepository.findById(payload["uid"].toString().toLong())
             .orElseThrow { MemberNotFoundException() }
 
-        val verifications = memberVerificationRepository.findValidKeys(member, MemberVerifyType.RESET_PASSWORD)
+        val verifications = memberVerificationRepository.findValidKeys(member, VerificationType.RESET_PASSWORD)
         val verification = verifications.find { passwordEncoder.matches(request.key, it.key) }
             ?: throw InvalidVerificationKeyException()
 
@@ -291,19 +290,19 @@ class MemberService(
 
         val key = passwordEncoder.encode(StringUtilities.random(6))!!
 
-        val verification = member.addVerification(MemberVerifyType.EMAIL_VERIFICATION, key, emailVerifyKeyExpiration)
+        val verification = member.addVerification(VerificationType.EMAIL_VERIFICATION, key, emailVerifyKeyExpiration)
         memberRepository.save(member)
 
         return verification
     }
 
     @Transactional
-    @MemberAction(MemberHistoryType.ACCOUNT_EMAIL_VERIFIED)
+    @MemberAction(HistoryLevel.ACCOUNT_EMAIL_VERIFIED)
     fun verifyEmail(request: MemberDto.VerifyEmailRequest, memberDetails: MemberDetails): MemberDto.Details {
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
 
-        val verifications = memberVerificationRepository.findValidKeys(member, MemberVerifyType.EMAIL_VERIFICATION)
+        val verifications = memberVerificationRepository.findValidKeys(member, VerificationType.EMAIL_VERIFICATION)
         val verification = verifications.find { passwordEncoder.matches(request.key, it.key) }
             ?: throw InvalidVerificationKeyException()
 

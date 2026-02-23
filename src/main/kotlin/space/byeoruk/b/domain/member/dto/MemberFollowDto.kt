@@ -2,13 +2,13 @@ package space.byeoruk.b.domain.member.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import space.byeoruk.b.domain.member.dto.MemberDto.Details
-import space.byeoruk.b.domain.member.model.MemberFollowState
+import space.byeoruk.b.domain.member.model.FollowState
 
 class MemberFollowDto {
 
     class Response(
         @Schema(description = "팔로우 여부", example = "UNFOLLOW / FOLLOW")
-        val state: MemberFollowState,
+        val state: FollowState,
         val followee: Details
     )
 

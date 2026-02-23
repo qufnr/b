@@ -8,7 +8,7 @@ import space.byeoruk.b.domain.member.dto.MemberFollowDto
 import space.byeoruk.b.domain.member.entity.MemberFollow
 import space.byeoruk.b.domain.member.exception.MemberFolloweeMyselfException
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
-import space.byeoruk.b.domain.member.model.MemberFollowState
+import space.byeoruk.b.domain.member.model.FollowState
 import space.byeoruk.b.domain.member.repository.MemberFollowRepository
 import space.byeoruk.b.domain.member.repository.MemberRepository
 
@@ -26,7 +26,7 @@ class MemberFollowService(
      */
     @Transactional
     fun toggle(followeeMemberUid: Long, memberDetails: MemberDetails): MemberFollowDto.Response {
-        var followState: MemberFollowState
+        var followState: FollowState
 
         val member = memberRepository.findById(memberDetails.username)
             .orElseThrow { MemberNotFoundException() }
@@ -43,13 +43,13 @@ class MemberFollowService(
         //  팔로우 중일 경우 언팔로우 처리
         if(isFollowing) {
             memberFollowRepository.deleteByFollowerAndFollowee(member, followee)
-            followState = MemberFollowState.UNFOLLOW
+            followState = FollowState.UNFOLLOW
         }
         //  팔로우를 안하고 있으면 팔로우 처리
         else {
             val follow = MemberFollow(follower = member, followee = followee)
             memberFollowRepository.save(follow)
-            followState = MemberFollowState.FOLLOW
+            followState = FollowState.FOLLOW
         }
 
         return MemberFollowDto.Response(followState, MemberDto.Details.fromEntity(followee))

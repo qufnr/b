@@ -12,7 +12,7 @@ import space.byeoruk.b.domain.member.dto.MemberDto
 import space.byeoruk.b.domain.member.dto.MemberHistoryDto
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.entity.Member
-import space.byeoruk.b.domain.member.model.MemberHistoryType
+import space.byeoruk.b.domain.member.model.HistoryLevel
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.domain.member.service.MemberHistoryRecorder
 
@@ -40,8 +40,8 @@ class MemberHistoryAspect(
         if(resolvedMember != null) {
             //  이전, 이후 값 저장하려는 유형
             val beforeAfterSaveTypes = arrayOf(
-                MemberHistoryType.ACCOUNT_UPDATED,
-                MemberHistoryType.ACCOUNT_RESOURCE_UPDATED
+                HistoryLevel.ACCOUNT_UPDATED,
+                HistoryLevel.ACCOUNT_RESOURCE_UPDATED
             )
 
             //  이전, 이후 값이 변경된 사항이 있으면 계정 활동 기록에 저장

@@ -6,7 +6,7 @@ import space.byeoruk.b.domain.member.annotation.MemberAction
 import space.byeoruk.b.domain.member.dto.SignDto
 import space.byeoruk.b.domain.member.exception.MemberNotFoundException
 import space.byeoruk.b.domain.member.exception.PasswordMismatchException
-import space.byeoruk.b.domain.member.model.MemberHistoryType
+import space.byeoruk.b.domain.member.model.HistoryLevel
 import space.byeoruk.b.domain.member.provider.MemberTokenProvider
 import space.byeoruk.b.domain.member.repository.MemberRepository
 import space.byeoruk.b.security.model.TokenType
@@ -23,7 +23,7 @@ class SignService(
      * @param request 요청 정보 (계정 ID)
      * @return 사용자 ID 에 대한 상세 정보
      */
-    @MemberAction(MemberHistoryType.ID_SIGN)
+    @MemberAction(HistoryLevel.ID_SIGN)
     fun signId(request: SignDto.IdRequest): SignDto.IdDetails {
         val member = memberRepository.findByIdOrEmail(request.value, request.value)
             .orElseThrow{ MemberNotFoundException() }
@@ -38,7 +38,7 @@ class SignService(
      * @param authorization 로그인 토큰 문자열
      * @return 로그인 정보 (접근 토큰, 리프레시 토큰, 사용자 기본 정보)
      */
-    @MemberAction(MemberHistoryType.SIGN)
+    @MemberAction(HistoryLevel.SIGN)
     fun sign(request: SignDto.Request, authorization: String): SignDto.Details {
         //  Sign ID 토큰 검증
         val payload = memberTokenProvider.getTokenPayload(authorization, TokenType.SIGN)

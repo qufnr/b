@@ -1,6 +1,6 @@
 package space.byeoruk.b.domain.member.model
 
-enum class MemberHistoryType(val description: String) {
+enum class HistoryLevel(val description: String) {
     ID_SIGN("로그인 전 ID 검증"),
     SIGN("로그인"),
     SIGN_OUT("로그아웃"),

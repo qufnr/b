@@ -11,7 +11,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
-import space.byeoruk.b.domain.member.model.MemberVerifyType
+import space.byeoruk.b.domain.member.model.VerificationType
 import java.time.LocalDateTime
 
 @Table(name = "member_verification")
@@ -27,7 +27,7 @@ class MemberVerification(
 
     @Column(name = "type", length = 32, nullable = false, comment = "키 유형")
     @Enumerated(EnumType.STRING)
-    var type: MemberVerifyType,
+    var type: VerificationType,
 
     @Column(name = "expired_at", nullable = false, comment = "만료 시간")
     var expiredAt: LocalDateTime,
@@ -39,7 +39,7 @@ class MemberVerification(
     @JoinColumn(name = "member_uid", comment = "계정 UID", foreignKey = ForeignKey(name = "FK_member_verification_TO_member"))
     var member: Member
 ) {
-    constructor(member: Member, type: MemberVerifyType, key: String, expiration: Long): this(
+    constructor(member: Member, type: VerificationType, key: String, expiration: Long): this(
         key = key,
         type = type,
         expiredAt = LocalDateTime.now().plusMinutes(expiration),
