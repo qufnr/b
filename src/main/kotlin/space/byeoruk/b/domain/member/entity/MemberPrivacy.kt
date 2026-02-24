@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import space.byeoruk.b.domain.member.model.FollowAcceptType
 import space.byeoruk.b.domain.member.model.PrivacyStatus
 
 @Table(name = "member_privacy")
@@ -18,21 +19,19 @@ class MemberPrivacy(
     @Column(name = "uid", nullable = false, unique = true, comment = "UID")
     var uid: Long = 0L,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "profile", nullable = false, comment = "프로필 공개 여부")
-    @Enumerated(EnumType.STRING)
-    var profile: PrivacyStatus,
+    var profile: PrivacyStatus = PrivacyStatus.PUBLIC,
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "birthday", nullable = false, comment = "탄생일 공개 여부")
-    @Enumerated(EnumType.STRING)
-    var birthday: PrivacyStatus,
+    var birthday: PrivacyStatus = PrivacyStatus.FOLLOW_ONLY,
 
-    @Column(name = "feed", nullable = false, comment = "피드 공개 여부")
     @Enumerated(EnumType.STRING)
-    var feed: PrivacyStatus,
-) {
-    constructor(): this(
-        profile = PrivacyStatus.PUBLIC,
-        birthday = PrivacyStatus.FOLLOW_ONLY,
-        feed = PrivacyStatus.PUBLIC
-    )
-}
+    @Column(name = "feed", nullable = false, comment = "피드 공개 여부")
+    var feed: PrivacyStatus = PrivacyStatus.PUBLIC,
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "follow_accept", nullable = false, comment = "팔로우 수락 유형")
+    val followAccept: FollowAcceptType = FollowAcceptType.DEFAULT
+)

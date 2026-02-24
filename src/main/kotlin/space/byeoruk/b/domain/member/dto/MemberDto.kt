@@ -113,7 +113,26 @@ class MemberDto {
     )
 
     /**
-     * 기본 계정 조회
+     * 간략한 계정 정보
+     */
+    class ShortDetails(
+        val uid: Long,
+        val id: String,
+        val name: String?,
+        val authorities: List<MemberRole>
+    ) {
+        companion object {
+            fun fromEntity(member: Member): ShortDetails = ShortDetails(
+                uid = member.uid,
+                id = member.id,
+                name = member.name,
+                authorities = member.authorities.map { authority -> authority.authority }.toList()
+            )
+        }
+    }
+
+    /**
+     * 계정 정보
      */
     class Details(
         @Schema(description = "계정 UID", example = "1")
@@ -184,8 +203,8 @@ class MemberDto {
              * @param member 계정 Entity
              * @return MemberDto.Details 항목
              */
-            fun fromEntity(member: Member): Details {
-                return Details(
+            fun fromEntity(member: Member): Details =
+                Details(
                     uid = member.uid,
                     id = member.id,
                     email = member.email,
@@ -204,7 +223,6 @@ class MemberDto {
                     privacy = MemberPrivacyDto.Details.fromEntity(member.privacy),
                     authorities = member.authorities.map { authority -> authority.authority }.toList()
                 )
-            }
 
             /**
              * 로그 찍을 때 쓰는 스냅샷
