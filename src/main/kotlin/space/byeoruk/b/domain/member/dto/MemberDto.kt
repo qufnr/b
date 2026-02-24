@@ -47,10 +47,10 @@ class MemberDto {
     class UpdateRequest(
         @Schema(description = "계정 이름", example = "아리텐동")
         @Size(max = 16, message = "{validation.member.name.size}")
-        val name: String,
+        val name: String?,
         @Schema(description = "소개글", example = "<p>안녕하세요.</p><p>반갑습니다.</p>")
         @Size(max = 512, message = "{validation.member.bio.size}")
-        val bio: String,
+        val bio: String?,
         @Schema(description = "생일", example = "1972-12-31")
         val birthday: LocalDate?,
         val privacy: MemberPrivacyDto.UpdateRequest?,

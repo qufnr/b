@@ -120,7 +120,7 @@ class MemberService(
             .orElseThrow { MemberNotFoundException() }
 
         //  이름 변경 날짜 확인
-        if(request.name != member.name && member.lastNameChangedDate != null) {
+        if(request.name != null && request.name != member.name && member.lastNameChangedDate != null) {
             val nameCanChangeDate = member.lastNameChangedDate!!.plusDays(nameChangeDelay)
             val now = LocalDate.now()
 

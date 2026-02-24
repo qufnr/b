@@ -108,12 +108,12 @@ class Member(
      * 계정 수정
      */
     fun update(request: MemberDto.UpdateRequest) {
-        if(request.name.isNotBlank() && name != request.name)
+        if(request.name?.isNotBlank() == true && name != request.name)
             lastNameChangedDate = LocalDate.now()
 
-        name = request.name
-        bio = request.bio
-        birthday = request.birthday
+        name = request.name ?: name
+        bio = request.bio ?: bio
+        birthday = request.birthday ?: birthday
 
         if(request.privacy != null) {
             privacy.profile = request.privacy.profile
