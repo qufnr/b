@@ -21,7 +21,7 @@ class AuditorConfiguration {
             authentication.isAuthenticated &&
             !authentication.name.equals("anonymousUser")) {
             val memberDetails = authentication.principal as MemberDetails
-            return AuditorAware { Optional.of<Long>(memberDetails.getIdentity()) }
+            return AuditorAware { Optional.of<Long>(memberDetails.getIdentifier()) }
         }
 
         return AuditorAware { Optional.of<Long>(0L) }

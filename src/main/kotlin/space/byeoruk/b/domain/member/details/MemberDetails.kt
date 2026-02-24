@@ -4,9 +4,7 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import space.byeoruk.b.domain.member.dto.MemberDto
-import space.byeoruk.b.domain.member.entity.Member
 import space.byeoruk.b.domain.member.model.MemberRole
-import java.util.stream.Collectors
 
 class MemberDetails(
     private val uid: Long,
@@ -27,7 +25,7 @@ class MemberDetails(
         this.authorities = member.authorities
     }
 
-    fun getIdentity(): Long {
+    fun getIdentifier(): Long {
         return uid
     }
 
