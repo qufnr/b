@@ -57,6 +57,7 @@ class SecurityConfiguration(
             .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico", "$resourceUri**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/common-management/enums/*").permitAll()      //  열거형 변수 단건 조회
                 .requestMatchers(HttpMethod.GET, "/api/common-management/enums").permitAll()        //  열거형 변수 전체 조회
+                //  Member
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs").permitAll()               //  로그인
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/id").permitAll()            //  로그인 전 ID 검증
                 .requestMatchers(HttpMethod.POST, "/api/member-management/signs/refresh").permitAll()       //  로그인 토큰 리프레시
@@ -72,6 +73,10 @@ class SecurityConfiguration(
                 .requestMatchers(HttpMethod.PUT, "/api/member-management/members/verify/email").authenticated()         //  계정 이메일 인증
                 .requestMatchers(HttpMethod.POST, "/api/member-management/members/verify/email/send").authenticated()   //  계정 이메일 인증 키 전송
                 .requestMatchers(HttpMethod.POST, "/api/member-management/follows/toggle/*").authenticated()    //  계정 팔로우
+                //  Notification
+                .requestMatchers(HttpMethod.GET, "/api/notification-management/notifications").authenticated()  //  알림 조회
+                .requestMatchers(HttpMethod.PUT, "/api/notification-management/notifications/*").authenticated()    //  알림 수정 (읽기 처리)
+                .requestMatchers(HttpMethod.DELETE, "/api/notification-management/notifications**").authenticated() //  알림 단건/일괄 삭제
                 .anyRequest().denyAll()
             }
             .exceptionHandling { configurer -> configurer

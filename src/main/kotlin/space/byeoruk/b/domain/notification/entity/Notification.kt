@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import space.byeoruk.b.domain.member.entity.Member
+import space.byeoruk.b.domain.notification.dto.NotificationDto
 import space.byeoruk.b.domain.notification.model.NotificationType
 import java.time.LocalDateTime
 
@@ -37,11 +38,15 @@ class Notification(
     val type: NotificationType,
 
     @Column(name = "is_read", comment = "읽음 여부", nullable = false)
-    val isRead: Boolean = false,
+    var isRead: Boolean = false,
 
     @Column(name = "message", comment = "간단한 메시지 또는 JSON 문자열", length = 512)
     var message: String? = null,
 
     @Column(name = "sent_at", comment = "전송 날짜", nullable = false)
     val sentAt: LocalDateTime = LocalDateTime.now(),
-)
+) {
+    fun update(request: NotificationDto.UpdateRequest) {
+        isRead = request.isRead
+    }
+}
