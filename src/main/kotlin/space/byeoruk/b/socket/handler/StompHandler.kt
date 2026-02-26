@@ -1,5 +1,6 @@
 package space.byeoruk.b.socket.handler
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.messaging.Message
@@ -21,6 +22,8 @@ import space.byeoruk.b.socket.exception.QueueAccessDeniedException
 import space.byeoruk.b.socket.exception.SubscribeAccessorInvalidException
 import java.security.Principal
 
+private val logger = KotlinLogging.logger {}
+
 @Component
 //  Spring Security 필터보다 우선순위를 높게 설정
 @Order(Ordered.HIGHEST_PRECEDENCE + 99)
@@ -29,48 +32,60 @@ class StompHandler(
     private val memberDetailsService: MemberDetailsServiceImpl
 ): ChannelInterceptor {
     override fun preSend(message: Message<*>, channel: MessageChannel): Message<*>? {
-        val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
+        try {
+            val accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor::class.java)
 
-        if(accessor != null) {
-            when(accessor.command) {
-                //  연결 시에만 JWT 검증
-                StompCommand.CONNECT -> {
-                    //  JWT 읽기
-                    val authorization = accessor.getFirstNativeHeader("Authorization")
-                        ?: throw TokenValidationException("error.token.missing")
-                    val token = tokenProvider.getBearerToken(authorization)
+            if(accessor != null) {
+                logger.info { "STOMP Command: ${accessor.command}" }
 
-                    //  JWT 검증
-                    if(!tokenProvider.isValidToken(token))
-                        throw TokenValidationException("error.token.invalid")
+                when(accessor.command) {
+                    //  연결 시에만 JWT 검증
+                    StompCommand.CONNECT -> {
+                        //  JWT 읽기
+                        val rawToken = accessor.getFirstNativeHeader("Authorization")
+                            ?: throw TokenValidationException("error.token.missing")
+                        val token = tokenProvider.getBearerToken(rawToken)
 
-                    //  JWT 페이로드 읽기
-                    val payload = tokenProvider.getTokenPayload(token)
-                    val memberId = payload["id"] as String
+                        logger.info { "Connection Token: $rawToken" }
 
-                    //  사용자 인증 객체 생성
-                    val memberDetails = memberDetailsService.loadUserByUsername(memberId)
+                        //  JWT 검증
+                        if(!tokenProvider.isValidToken(token)) {
+                            logger.error { "Invalid Token!!" }
+                            throw TokenValidationException("error.token.invalid")
+                        }
 
-                    if(!memberDetails.isAccountNonLocked)
-                        throw AccountBlockedException()
+                        //  JWT 페이로드 읽기
+                        val payload = tokenProvider.getTokenPayload(token)
+                        val memberId = payload["id"] as String
 
-                    if(!memberDetails.isEnabled)
-                        throw AccountDisabledException()
+                        //  사용자 인증 객체 생성
+                        val memberDetails = memberDetailsService.loadUserByUsername(memberId)
 
-                    //  Accessor에 사용자 정보 주입
-                    accessor.user = UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.authorities)
+                        if(!memberDetails.isAccountNonLocked)
+                            throw AccountBlockedException()
+
+                        if(!memberDetails.isEnabled)
+                            throw AccountDisabledException()
+
+                        //  Accessor에 사용자 정보 주입
+                        accessor.user = UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.authorities)
+                    }
+
+                    //  구독 시 권한 검사
+                    StompCommand.SUBSCRIBE -> {
+                        val member = accessor.user ?: throw SubscribeAccessorInvalidException()
+                        val destination = accessor.destination ?: throw DestinationNotFoundException()
+
+                        validateSubscription(member, destination)
+                    }
+
+                    else -> {}
                 }
-
-                //  구독 시 권한 검사
-                StompCommand.SUBSCRIBE -> {
-                    val member = accessor.user ?: throw SubscribeAccessorInvalidException()
-                    val destination = accessor.destination ?: throw DestinationNotFoundException()
-
-                    validateSubscription(member, destination)
-                }
-
-                else -> {}
             }
+        }
+        catch(e: Exception) {
+            logger.error(e) { "STOMP preSend Error: ${e.message}" }
+            throw e
         }
 
         return message
