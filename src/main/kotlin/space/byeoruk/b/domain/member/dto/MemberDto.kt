@@ -116,9 +116,16 @@ class MemberDto {
      * 간략한 계정 정보
      */
     class ShortDetails(
+        @Schema(description = "계정 UID", example = "1")
         val uid: Long,
+        @Schema(description = "계정 ID", example = "username1234")
         val id: String,
+        @Schema(description = "계정 이름", example = "테스트 사용자")
         val name: String?,
+        @Schema(description = "아바타 이미지 파일", example = "filename.jpg")
+        val avatar: String? = "",
+        @Schema(description = "색상", example = "#FFFF00")
+        val colour: String,
         val authorities: List<MemberRole>
     ) {
         companion object {
@@ -126,6 +133,8 @@ class MemberDto {
                 uid = member.uid,
                 id = member.id,
                 name = member.name,
+                avatar = member.avatar,
+                colour = member.colour,
                 authorities = member.authorities.map { authority -> authority.authority }.toList()
             )
         }

@@ -1,0 +1,6 @@
+### 알림 조회
+GET {{url}}notification-management/notifications
+    ?page=0
+    &size=10
+Content-Type: application/json
+Authorization: Bearer {{bearer.access}}

@@ -54,7 +54,7 @@ class SecurityConfiguration(
             .formLogin { configurer -> configurer.disable() }
             .cors { configurer -> configurer.configurationSource(corsConfigurationSource) }
             .sessionManagement { configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico", "$resourceUri**").permitAll()
+            .authorizeHttpRequests { registry -> registry.requestMatchers("/", "/error", "/favicon.ico", "$resourceUri**", "/ws/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/common-management/enums/*").permitAll()      //  열거형 변수 단건 조회
                 .requestMatchers(HttpMethod.GET, "/api/common-management/enums").permitAll()        //  열거형 변수 전체 조회
                 //  Member

@@ -11,8 +11,9 @@ import org.springframework.messaging.support.MessageHeaderAccessor
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Component
 import space.byeoruk.b.domain.member.details.MemberDetails
+import space.byeoruk.b.domain.member.exception.AccountBlockedException
+import space.byeoruk.b.domain.member.exception.AccountDisabledException
 import space.byeoruk.b.domain.member.service.MemberDetailsServiceImpl
-import space.byeoruk.b.domain.member.service.MemberService
 import space.byeoruk.b.security.exception.TokenValidationException
 import space.byeoruk.b.security.provider.TokenProvider
 import space.byeoruk.b.socket.exception.DestinationNotFoundException
@@ -48,10 +49,16 @@ class StompHandler(
                     val memberId = payload["id"] as String
 
                     //  사용자 인증 객체 생성
-                    val userDetails = memberDetailsService.loadUserByUsername(memberId)
+                    val memberDetails = memberDetailsService.loadUserByUsername(memberId)
+
+                    if(!memberDetails.isAccountNonLocked)
+                        throw AccountBlockedException()
+
+                    if(!memberDetails.isEnabled)
+                        throw AccountDisabledException()
 
                     //  Accessor에 사용자 정보 주입
-                    accessor.user = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
+                    accessor.user = UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.authorities)
                 }
 
                 //  구독 시 권한 검사
