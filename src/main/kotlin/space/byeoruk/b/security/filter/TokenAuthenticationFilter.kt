@@ -9,6 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import space.byeoruk.b.domain.member.exception.AccountBlockedException
+import space.byeoruk.b.domain.member.exception.AccountDisabledException
 import space.byeoruk.b.domain.member.service.MemberDetailsServiceImpl
 import space.byeoruk.b.security.model.TokenType
 import space.byeoruk.b.security.provider.TokenProvider
@@ -33,10 +35,10 @@ class TokenAuthenticationFilter(
                     val memberDetails = memberDetailsService.loadUserByUsername(payload["id"] as String)
 
                     if(!memberDetails.isAccountNonLocked)
-                        throw BadCredentialsException("차단된 계정입니다. 관리자에게 문의해 주세요.")
+                        throw AccountBlockedException()
 
                     if(!memberDetails.isEnabled)
-                        throw BadCredentialsException("비활성화 상태인 계정입니다. 활성화 하려면 계정을 다시 인증해 주세요.")
+                        throw AccountDisabledException()
 
                     val authentication = UsernamePasswordAuthenticationToken(memberDetails, "", memberDetails.authorities)
 
